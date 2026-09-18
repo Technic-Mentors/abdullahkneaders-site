@@ -8,7 +8,7 @@
 export const BRAND_NAME = 'MA Universal';
 export const DEV_BACKEND_PORT = 3005;
 export const DEV_FRONTEND_PORT = 5174;
-export const PROD_API_URL = 'https://backend.mauniversal.com'; // placeholder until real domain is bought
+export const PROD_API_URL = 'https://backend.mauniversalinc.com'; // placeholder until real domain is bought
 
 // --- Libas-e-Haram (reference/rollback) ---
 // export const BRAND_NAME = 'Libas-e-Haram';
