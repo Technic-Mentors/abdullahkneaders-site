@@ -17,24 +17,28 @@ const staggerContainer = {
 
 const FAQS = [
   {
-    q: 'How do I choose the right belt size?',
-    a: 'Belt size is typically your waist measurement plus 2 inches. Check our Size Guide page for a full waist-to-belt-size chart to help you choose correctly.',
+    q: 'How long does it take to knead dough?',
+    a: 'Add the flour and water, close the lid, and start the machine. Five minutes later, your dough is ready to cook — soft, smooth, and consistent every time.',
   },
   {
-    q: 'Do you offer Cash on Delivery?',
-    a: 'Yes, all orders are Cash on Delivery. You only pay when your order arrives at your doorstep.',
+    q: 'What can I make with the Abdullah Dough Maker?',
+    a: 'Atta for roti and chapati, maida for naan, pizza, pastries and cookies, and minced qeema mixtures. One machine handles all your family recipes.',
   },
   {
-    q: 'How long does delivery take?',
-    a: 'Delivery typically takes 3–7 business days depending on your city, after our team confirms your order by phone.',
+    q: 'How much water should I add?',
+    a: 'Use the measuring cup that comes with your machine to pour the water. For best results, add the measured flour first, then the measured water.',
   },
   {
-    q: 'Can I return or exchange an item?',
-    a: 'Yes, please see our Shipping & Returns policy page for details on our return window and conditions.',
+    q: 'Which size should I choose?',
+    a: 'We offer a 3.5 kg model (AE-900A) for everyday family cooking, and a 5 kg model (AE-221) for bigger batches and households. Pick the size that suits your kitchen.',
   },
   {
-    q: 'Can I cancel my order?',
-    a: 'You can cancel your order from your account before it has been confirmed by our team. After confirmation, please contact us directly.',
+    q: 'How do delivery and payment work?',
+    a: 'Delivery is free on orders over Rs. 5,000, and Cash on Delivery is available nationwide. Pay by direct bank transfer and get an exclusive ₨ 200 discount on your order.',
+  },
+  {
+    q: 'Who do I contact if something is wrong?',
+    a: 'Call us on  +923206466000 between 08:00 and 17:00, or send a message through our Contact page. We respond within 24 hours — before, during, and after your order arrives.',
   },
 ];
 
@@ -75,7 +79,7 @@ export default function FaqPage() {
           </h1>
 
           <p className="mx-auto mt-4 max-w-lg text-sm text-charcoal-light sm:text-base">
-            Quick answers to common questions about sizing, delivery, returns, and your gear.
+            Quick answers to common questions about dough making, sizing, delivery, and payment.
           </p>
 
           <div className="mx-auto mt-6 h-px w-24 bg-gradient-to-r from-transparent via-gold-500 to-transparent" />
@@ -182,7 +186,7 @@ export default function FaqPage() {
         </motion.div>
       </div>
 
-      {/* ══════════════ FINAL CTA — no background, matches About/Contact/Offers ══════════════ */}
+      {/* ══════════════ FINAL CTA ══════════════ */}
       <section className="relative overflow-hidden bg-cream">
         <motion.div
           initial={{ opacity: 0, y: 16 }}

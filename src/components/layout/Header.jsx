@@ -12,15 +12,15 @@ import SearchBar from './SearchBar';
 
 const NAV_LINKS = [
   { to: '/about', label: 'About' },
+  { to: '/benefits', label: 'Benefits' },
   { to: '/offers', label: 'Offers' },
   { to: '/blog', label: 'Blog' },
   { to: '/contact', label: 'Contact' },
 ];
 
-// TODO: replace with MA Universal's real social/WhatsApp accounts once available.
-const FACEBOOK_URL = 'https://www.facebook.com/mauniversal.official/';
-const INSTAGRAM_URL = 'https://www.instagram.com/mauniversal/';
-const WHATSAPP_NUMBER = '+923107524444';
+const FACEBOOK_URL = 'https://www.facebook.com/CapitalDoughMaker';
+const INSTAGRAM_URL = 'https://www.instagram.com/capitaldoughmaker/';
+const WHATSAPP_NUMBER = '923107777899';
 const WHATSAPP_URL = `https://wa.me/${WHATSAPP_NUMBER}`;
 
 const Header = React.forwardRef(function Header(_, ref) {
@@ -54,9 +54,9 @@ const Header = React.forwardRef(function Header(_, ref) {
         <div className="relative mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-2 sm:px-6">
           {/* Left: Welcome message */}
           <p className="text-[11px] font-medium tracking-wide text-stone-300 sm:text-xs">
-            Welcome to <span className="text-stone-300">MA Universal</span>
+            Welcome to <span className="text-stone-300">Abdullah Kneaders</span>
             <span className="mx-1.5 text-stone-300">—</span>
-           Sports. Fitness. Equestrian.
+           Perfect Dough, Every Time.
           </p>
 
           {/* Right: Social icons (bigger, compact) */}
@@ -93,11 +93,13 @@ const Header = React.forwardRef(function Header(_, ref) {
       </div>
 
       {/* ══════════════ MAIN HEADER ══════════════ */}
-      <div className="mx-auto grid max-w-7xl grid-cols-[auto_1fr_auto] items-center gap-3 px-4 py-2.5 sm:px-6">
+      {/* Equal-width side columns on wide screens keep the nav group (Home · Categories · …)
+          centred relative to the page instead of centred inside the leftover middle space. */}
+      <div className="mx-auto grid max-w-7xl grid-cols-[auto_1fr_auto] items-center gap-3 px-4 py-2.5 sm:px-6 xl:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]">
         <div className="flex shrink-0 items-center gap-2.5">
           {!mobileSearchOpen && (
             <Link to="/" className="flex items-center gap-2.5">
-              <img src="/logo.png" alt="MA Universal" className="h-12 w-auto sm:h-16" />
+              <img src="/logo.png" alt="Abdullah Kneaders" className="h-12 w-auto sm:h-16" />
             </Link>
           )}
         </div>
@@ -324,6 +326,20 @@ function navLinkClass(isActive) {
 function CategoriesDropdown({ topCategories, subcategoriesOf }) {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
+  const count = topCategories.length;
+
+  // A fixed 640px / 4-column panel left empty grey cells when only a couple of
+  // categories exist, so the panel now shrinks and centres with its content.
+  const panelWidth =
+    count <= 1
+      ? 'w-[min(92vw,300px)]'
+      : count === 2
+        ? 'w-[min(92vw,460px)]'
+        : count === 3
+          ? 'w-[min(92vw,560px)]'
+          : 'w-[min(92vw,640px)]';
+  const gridCols =
+    count <= 2 ? 'grid-cols-1 sm:grid-cols-2' : count === 3 ? 'grid-cols-1 sm:grid-cols-3' : 'grid-cols-2 sm:grid-cols-4';
 
   useEffect(() => {
     function handleClick(e) {
@@ -360,12 +376,12 @@ function CategoriesDropdown({ topCategories, subcategoriesOf }) {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -8, scale: 0.98 }}
             transition={{ duration: 0.18, ease: 'easeOut' }}
-            className="absolute left-1/2 top-full z-30 w-[min(92vw,640px)] -translate-x-1/2 pt-3"
+            className={cn('absolute left-1/2 top-full z-30 -translate-x-1/2 pt-3', panelWidth)}
           >
             <div className="overflow-hidden rounded-xl border border-stone-200 bg-white shadow-xl ring-1 ring-black/5">
               <div className="h-1 w-full bg-gradient-to-r from-gold-300 via-gold-500 to-gold-300" />
 
-              <div className="grid grid-cols-2 gap-px bg-stone-100 sm:grid-cols-4">
+              <div className={cn('grid gap-px bg-stone-100', gridCols)}>
                 {topCategories.length === 0 ? (
                   <p className="col-span-full px-6 py-5 text-sm text-charcoal-light">
                     No categories yet.

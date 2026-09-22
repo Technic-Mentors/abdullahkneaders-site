@@ -22,6 +22,7 @@ const ForgotPasswordPage = lazy(() => import('./pages/ForgotPasswordPage'));
 const ResetPasswordPage = lazy(() => import('./pages/ResetPasswordPage'));
 const VerifyEmailPage = lazy(() => import('./pages/VerifyEmailPage'));
 const AboutPage = lazy(() => import('./pages/AboutPage'));
+const BenefitsPage = lazy(() => import('./pages/BenefitsPage'));
 const ContactPage = lazy(() => import('./pages/ContactPage'));
 const FaqPage = lazy(() => import('./pages/FaqPage'));
 const SizeGuidePage = lazy(() => import('./pages/SizeGuidePage'));
@@ -70,9 +71,8 @@ function PageFallback() {
 }
 
 /* ═══════════════ Floating WhatsApp Button ═══════════════ */
-// TODO: replace with MA Universal's real WhatsApp business number once available.
-const WHATSAPP_NUMBER = '';
-const WHATSAPP_MESSAGE = 'Hi! I have a question about your sports, fitness, and equestrian gear.';
+const WHATSAPP_NUMBER = '923107777899';
+const WHATSAPP_MESSAGE = 'Hello Abdullah Kneaders, I would like to know more about your products.';
 
 function FloatingWhatsApp() {
   const { pathname } = useLocation();
@@ -130,6 +130,7 @@ export default function App() {
             <Route path="reset-password/:token" element={<ResetPasswordPage />} />
             <Route path="verify-email/:token" element={<VerifyEmailPage />} />
             <Route path="about" element={<AboutPage />} />
+            <Route path="benefits" element={<BenefitsPage />} />
             <Route path="contact" element={<ContactPage />} />
             <Route path="faq" element={<FaqPage />} />
             <Route path="size-guide" element={<SizeGuidePage />} />

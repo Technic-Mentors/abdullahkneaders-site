@@ -140,7 +140,7 @@ export default function Coupons() {
             {
               key: 'value',
               label: 'Value',
-              render: (row) => (row.type === 'percentage' ? `${row.value}%` : `$${row.value}`),
+              render: (row) => (row.type === 'percentage' ? `${row.value}%` : `Rs. ${row.value}`),
             },
             { key: 'times_used', label: 'Times Used', render: (row) => row.times_used ?? row.timesUsed ?? 0 },
             {

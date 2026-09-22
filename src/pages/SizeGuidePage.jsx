@@ -16,76 +16,80 @@ const staggerContainer = {
 
 const SECTIONS = [
   {
-    category: 'Championship Belts',
+    category: '3.5 kg Model',
     groups: [
       {
-        label: 'Championship Belts',
-        note: "Belt size runs a standard 2 inches larger than your waist measurement. If you're between two sizes, we recommend choosing the larger one for comfort.",
-        headers: ['Belt Size', 'Waist (in)', 'Length (in)'],
+        label: 'AE-900A — Compact Dough Maker',
+        note: 'Ideal for everyday family cooking. Handles up to 3.5 kg of flour per batch — perfect for roti, chapati, and small naan batches.',
+        headers: ['Specification', 'Detail'],
         rows: [
-          ['32', '30-32', '38'],
-          ['34', '32-34', '40'],
-          ['36', '34-36', '42'],
-          ['38', '36-38', '44'],
-          ['40', '38-40', '46'],
-          ['42', '40-42', '48'],
+          ['Model', 'AE-900A'],
+          ['Capacity', '3.5 kg flour per batch'],
+          ['Kneading Time', '5 minutes'],
+          ['Best For', 'Roti, Chapati, Paratha'],
+          ['Power', 'Efficient motor, low energy use'],
+          ['Warranty', 'Covered — see product page for details'],
         ],
       },
     ],
   },
   {
-    category: 'Weight Lifting Belts',
+    category: '5 kg Model',
     groups: [
       {
-        label: 'Weight Lifting Belts',
-        note: 'Measure around your waist at navel height. Lifting belts are worn snug — size up if you plan to lift with heavier layers underneath.',
-        headers: ['Belt Size', 'Waist (in)', 'Width (in)'],
+        label: 'AE-221 — Spacious Dough Maker',
+        note: 'Built for bigger batches and bigger households. Handles up to 5 kg of flour per batch — ideal for naan, pizza, pastries, and large family gatherings.',
+        headers: ['Specification', 'Detail'],
         rows: [
-          ['S', '28-32', '4'],
-          ['M', '32-36', '4'],
-          ['L', '36-40', '4'],
-          ['XL', '40-44', '4'],
-          ['XXL', '44-48', '4'],
+          ['Model', 'AE-221'],
+          ['Capacity', '5 kg flour per batch'],
+          ['Kneading Time', '5 minutes'],
+          ['Best For', 'Naan, Pizza, Pastry, Cookies'],
+          ['Power', 'Efficient motor, low energy use'],
+          ['Warranty', 'Covered — see product page for details'],
         ],
       },
     ],
   },
   {
-    category: 'Equestrian Gear',
+    category: 'What It Kneads',
     groups: [
       {
-        label: 'Saddle Pads & Equestrian Accessories',
-        note: 'Most equestrian gear is sized as One Size or by specific product measurements (e.g. saddle pad length, girth length) — check the individual product page for exact dimensions.',
-        headers: ['Item', 'Sizing'],
+        label: 'Atta, Maida, and Qeema',
+        note: 'One machine handles everything your kitchen makes — from daily roti to festive bakes and minced mixtures.',
+        headers: ['Ingredient', 'Perfect For'],
         rows: [
-          ['Saddle Pads', 'One Size (fits standard English/Western saddles)'],
-          ['Girths', 'Product-specific — see listing for length'],
-          ['Bridles & Reins', 'One Size, adjustable'],
+          ['Atta', 'Roti, Chapati, Paratha'],
+          ['Maida', 'Naan, Pizza, Pastry, Cookies'],
+          ['Qeema', 'Kebab mixes, Koftay'],
         ],
       },
     ],
   },
   {
-    category: 'Buckles & Swivels',
+    category: 'Delivery & Payment',
     groups: [
       {
-        label: 'Buckles & Swivels',
-        note: 'Buckles and swivels are sized by hardware dimensions rather than body measurements — sold as One Size per product, with exact width/diameter listed on the product page.',
-        headers: ['Item', 'Sizing'],
+        label: 'How Ordering Works',
+        note: 'Simple, transparent, and Cash on Delivery — pay only when your machine arrives at your door.',
+        headers: ['Item', 'Detail'],
         rows: [
-          ['Belt Buckles', 'One Size (fits standard 1.5" belts unless noted)'],
-          ['Swivels', 'Product-specific — see listing for dimensions'],
+          ['Delivery Fee', 'Free on orders over Rs. 5,000'],
+          ['Cash on Delivery', 'Available nationwide'],
+          ['Bank Transfer Discount', '₨ 200 off on bank transfer'],
+          ['Delivery Time', '3–7 business days after confirmation'],
+          ['Coverage', '50+ cities across Pakistan'],
         ],
       },
     ],
   },
 ];
 
-const HOW_TO_MEASURE = [
-  ['Waist', 'Measure around your natural waistline, just above the belly button, to find your belt size.'],
-  ['Belt Size', 'Add 2 inches to your waist measurement for a comfortable, standard belt fit.'],
-  ['Girth', 'Measure around the horse’s barrel, just behind the front legs, for equestrian gear sizing.'],
-  ['Hardware', 'For buckles and swivels, check the product listing for exact width and diameter.'],
+const HOW_TO_CHOOSE = [
+  ['Household Size', 'For 1–4 people, the 3.5 kg (AE-900A) is ideal. For 5+ people or frequent large batches, choose the 5 kg (AE-221).'],
+  ['Daily vs. Occasional', 'Cooking roti every day? The 3.5 kg model keeps up. Baking naan, pizza, or pastries regularly? Go with the 5 kg.'],
+  ['Counter Space', 'Both models are compact and designed for modern kitchens. Measure your countertop space if you plan to keep it out.'],
+  ['What You Knead', 'Atta, maida, and qeema are all handled by both models — pick the capacity that matches your weekly cooking.'],
 ];
 
 export default function SizeGuidePage() {
@@ -113,17 +117,17 @@ export default function SizeGuidePage() {
           <div className="mb-4 flex items-center justify-center gap-3">
             <span className="h-px w-10 bg-gradient-to-r from-transparent to-gold-600/70" />
             <span className="text-[10px] font-semibold uppercase tracking-[0.3em] text-gold-600">
-              Find Your Fit
+              Find Your Model
             </span>
             <span className="h-px w-10 bg-gradient-to-l from-transparent to-gold-600/70" />
           </div>
 
           <h1 className="font-serif text-4xl leading-tight text-charcoal sm:text-5xl lg:text-6xl">
-            Size <span className="text-gold-600">Guide</span>
+            Model &amp; <span className="text-gold-600">Size Guide</span>
           </h1>
 
           <p className="mx-auto mt-4 max-w-lg text-sm text-charcoal-light sm:text-base">
-            Measurements for belts, lifting gear, and equestrian equipment — find your perfect fit before you order.
+            Compare our dough maker models, kneading capacities, and everything each machine can do — find your perfect fit before you order.
           </p>
 
           <div className="mx-auto mt-6 h-px w-24 bg-gradient-to-r from-transparent via-gold-500 to-transparent" />
@@ -132,7 +136,7 @@ export default function SizeGuidePage() {
 
       {/* ══════════════ CONTENT ══════════════ */}
       <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
-        {/* ── How to Measure ── */}
+        {/* ── How to Choose ── */}
         <motion.div
           variants={fadeUp}
           initial="hidden"
@@ -144,16 +148,16 @@ export default function SizeGuidePage() {
 
           <span className="inline-flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-gold-600">
             <span className="h-px w-5 bg-gold-400" />
-            Getting the Right Measurements
+            Choosing the Right Dough Maker
             <span className="h-px w-5 bg-gold-400" />
           </span>
 
           <h2 className="mt-1.5 font-serif text-xl text-charcoal sm:text-2xl">
-            How to Measure
+            How to Choose
           </h2>
 
           <dl className="mt-4 grid grid-cols-1 gap-x-6 gap-y-3 sm:grid-cols-2">
-            {HOW_TO_MEASURE.map(([term, desc]) => (
+            {HOW_TO_CHOOSE.map(([term, desc]) => (
               <div key={term} className="flex items-start gap-2.5">
                 <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-gold-500" />
                 <div>
@@ -249,7 +253,7 @@ export default function SizeGuidePage() {
         ))}
       </div>
 
-      {/* ══════════════ FINAL CTA — no background, matches About/Contact/FAQ/Offers ══════════════ */}
+      {/* ══════════════ FINAL CTA ══════════════ */}
       <section className="relative overflow-hidden bg-cream">
         <motion.div
           initial={{ opacity: 0, y: 16 }}
@@ -267,11 +271,11 @@ export default function SizeGuidePage() {
           </div>
 
           <h2 className="font-serif text-2xl leading-tight text-charcoal sm:text-3xl lg:text-4xl">
-            Still Unsure Which <span className="text-gold-600">Size to Pick?</span>
+            Still Unsure Which <span className="text-gold-600">Model to Pick?</span>
           </h2>
 
           <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-charcoal-light sm:text-base">
-            Send us your measurements and we&apos;ll help you choose the perfect fit before you order.
+            Send us your household size and cooking habits, and we&apos;ll help you choose the perfect dough maker before you order.
           </p>
 
           <div className="mt-6 flex flex-wrap items-center justify-center gap-3">

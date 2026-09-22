@@ -58,6 +58,10 @@ export default function ProductPage() {
 
   const price = selectedVariant?.price_override ?? product.base_price;
   const allOutOfStock = product.variants.every((v) => v.stock_quantity === 0);
+  const discountPercent =
+    product.compare_at_price && Number(product.compare_at_price) > Number(price)
+      ? Math.round((1 - Number(price) / Number(product.compare_at_price)) * 100)
+      : 0;
 
   async function handleAddToCart() {
     if (!selectedVariant) return;
@@ -102,12 +106,12 @@ export default function ProductPage() {
   }
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6">
-      <nav className="mb-6 text-xs text-charcoal-light">
+    <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
+      <nav aria-label="Breadcrumb" className="mb-5 flex flex-wrap items-center gap-1.5 text-xs text-charcoal-light">
         <Link to="/" className="hover:text-gold-600">Home</Link>
-        <span className="mx-1.5 text-stone-300">/</span>
+        <span className="text-stone-300">/</span>
         <Link to={`/category/${product.category_slug}`} className="hover:text-gold-600">{product.category_name}</Link>
-        <span className="mx-1.5 text-stone-300">/</span>
+        <span className="text-stone-300">/</span>
         <span className="font-medium text-charcoal">{product.name}</span>
       </nav>
 
@@ -115,33 +119,42 @@ export default function ProductPage() {
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
-        className="grid gap-6 md:grid-cols-2"
+        className="grid items-start gap-6 md:grid-cols-2 lg:gap-10"
       >
         <ProductGallery images={product.images} />
 
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-gold-600">{product.category_name}</p>
-          <h1 className="mt-1 font-serif text-3xl text-charcoal">{product.name}</h1>
-          <div className="mt-3 flex items-center gap-3">
+        <div className="rounded-xl border border-gold-500/15 bg-white p-5 shadow-sm sm:p-6">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-xs font-semibold uppercase tracking-[0.2em] text-gold-600">{product.category_name}</span>
+            <StockBadge allOutOfStock={allOutOfStock} variant={selectedVariant} />
+          </div>
+          <h1 className="mt-2 font-serif text-3xl leading-tight text-charcoal sm:text-[2rem]">{product.name}</h1>
+          <div className="mt-3 flex flex-wrap items-baseline gap-x-3 gap-y-1">
             <span className="text-2xl font-semibold text-gold-700">{formatCurrency(price)}</span>
             {product.compare_at_price && (
               <span className="text-sm text-stone-400 line-through">{formatCurrency(product.compare_at_price)}</span>
             )}
-            {!allOutOfStock && selectedVariant && selectedVariant.stock_quantity <= 5 && (
-              <span className="rounded-full bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-700">
-                Only {selectedVariant.stock_quantity} left
+            {discountPercent > 0 && (
+              <span className="rounded-full bg-gold-50 px-2.5 py-0.5 text-xs font-semibold text-gold-700">
+                Save {discountPercent}%
               </span>
             )}
           </div>
 
-          <div className="mt-6">
+          <div className="mt-6 border-t border-stone-100 pt-5">
             <VariantSelector variants={product.variants} onChange={setSelectedVariant} />
+            {selectedVariant?.sku && (
+              <p className="mt-3 text-[11px] uppercase tracking-wide text-stone-400">SKU: {selectedVariant.sku}</p>
+            )}
           </div>
 
           {allOutOfStock ? (
-            <form onSubmit={handleNotifyMe} className="mt-6 space-y-3 rounded-md bg-stone-50 p-4">
+            <form onSubmit={handleNotifyMe} className="mt-6 space-y-3 rounded-lg border border-stone-200 bg-stone-50 p-4">
               <p className="text-sm font-medium text-charcoal">This item is out of stock</p>
-              <div className="flex gap-2">
+              <p className="-mt-1 text-xs text-charcoal-light">
+                Leave your email and we&rsquo;ll let you know the moment it&rsquo;s back.
+              </p>
+              <div className="flex flex-col gap-2 sm:flex-row">
                 <Input
                   type="email"
                   required
@@ -154,9 +167,10 @@ export default function ProductPage() {
               </div>
             </form>
           ) : (
-            <div className="mt-6 flex items-center gap-3">
-              <div className="flex items-center gap-1 rounded-full border border-gold-500/30">
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
+              <div className="flex w-fit items-center gap-1 rounded-full border border-gold-500/30 px-1">
                 <button
+                  aria-label="Decrease quantity"
                   onClick={() => setQuantity((q) => Math.max(1, q - 1))}
                   className="flex h-9 w-9 items-center justify-center rounded-full text-charcoal-light transition-colors hover:bg-gold-50 hover:text-gold-700"
                 >
@@ -164,29 +178,41 @@ export default function ProductPage() {
                 </button>
                 <span className="min-w-[1.5rem] text-center text-sm font-medium text-charcoal">{quantity}</span>
                 <button
+                  aria-label="Increase quantity"
                   onClick={() => setQuantity((q) => Math.min(selectedVariant?.stock_quantity ?? 1, q + 1))}
                   className="flex h-9 w-9 items-center justify-center rounded-full text-charcoal-light transition-colors hover:bg-gold-50 hover:text-gold-700"
                 >
                   +
                 </button>
               </div>
-              <Button onClick={handleAddToCart} disabled={!selectedVariant || selectedVariant.stock_quantity === 0} className="flex-1">
-                Add to Cart
-              </Button>
-              <Button variant="outline" onClick={handleWishlistToggle}>
-                {isWishlisted ? '♥ Saved' : '♡ Wishlist'}
-              </Button>
+              <div className="flex flex-1 gap-2">
+                <Button
+                  onClick={handleAddToCart}
+                  disabled={!selectedVariant || selectedVariant.stock_quantity === 0}
+                  className="flex-1"
+                >
+                  Add to Cart
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={handleWishlistToggle}
+                  aria-pressed={isWishlisted}
+                  className="shrink-0"
+                >
+                  {isWishlisted ? '♥ Saved' : '♡ Wishlist'}
+                </Button>
+              </div>
             </div>
           )}
 
-          <div className="mt-6 grid grid-cols-2 gap-3 rounded-lg border border-gold-500/15 bg-gold-50/40 p-4 sm:grid-cols-4">
+          <div className="mt-6 grid grid-cols-2 gap-3 rounded-xl border border-gold-500/15 bg-gold-50/40 p-4 sm:grid-cols-4">
             <TrustPoint icon={<TruckIcon />} label="Cash on Delivery" />
             <TrustPoint icon={<ReturnIcon />} label="Easy Returns" />
             <TrustPoint icon={<BadgeIcon />} label="Quality Assured" />
             <TrustPoint icon={<LockIcon />} label="Secure Checkout" />
           </div>
 
-          <div className="mt-8 space-y-5 border-t border-gold-500/15 pt-6 text-sm text-charcoal-light">
+          <div className="mt-8 space-y-5 border-t border-stone-100 pt-6 text-sm leading-relaxed text-charcoal-light">
             {product.description && (
               <div>
                 <h3 className="mb-1 flex items-center gap-2 font-medium text-charcoal">
@@ -215,7 +241,7 @@ export default function ProductPage() {
         </div>
       </motion.div>
 
-      {reviewData?.reviews?.length > 0 && (
+      {reviewData && (
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -248,6 +274,28 @@ export default function ProductPage() {
         </motion.div>
       )}
     </div>
+  );
+}
+
+function StockBadge({ allOutOfStock, variant }) {
+  if (allOutOfStock) {
+    return (
+      <span className="rounded-full bg-red-50 px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-red-600">
+        Out of stock
+      </span>
+    );
+  }
+  if (variant && variant.stock_quantity > 0 && variant.stock_quantity <= 5) {
+    return (
+      <span className="rounded-full bg-amber-50 px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-amber-700">
+        Only {variant.stock_quantity} left
+      </span>
+    );
+  }
+  return (
+    <span className="rounded-full bg-emerald-50 px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-emerald-700">
+      In stock
+    </span>
   );
 }
 

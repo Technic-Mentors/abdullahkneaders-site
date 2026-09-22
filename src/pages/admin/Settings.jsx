@@ -15,6 +15,12 @@ const emptyForm = {
   store_address: '',
   return_window_days: '',
   return_policy_text: '',
+  bank_name: '',
+  bank_account_holder: '',
+  bank_account_number: '',
+  bank_iban: '',
+  bank_additional_info: '',
+  payment_whatsapp_number: '',
 };
 
 export default function Settings() {
@@ -31,6 +37,12 @@ export default function Settings() {
         store_address: data.store_address ?? '',
         return_window_days: data.return_window_days ?? '',
         return_policy_text: data.return_policy_text ?? '',
+        bank_name: data.bank_name ?? '',
+        bank_account_holder: data.bank_account_holder ?? '',
+        bank_account_number: data.bank_account_number ?? '',
+        bank_iban: data.bank_iban ?? '',
+        bank_additional_info: data.bank_additional_info ?? '',
+        payment_whatsapp_number: data.payment_whatsapp_number ?? '',
       });
     }
   }, [data]);
@@ -78,6 +90,45 @@ export default function Settings() {
             <Input label="Store Email" type="email" value={form.store_email} onChange={field('store_email')} />
             <Input label="Store Phone" maxLength={20} value={form.store_phone} onChange={field('store_phone')} />
             <Input label="Store Address" maxLength={255} value={form.store_address} onChange={field('store_address')} />
+          </div>
+        </div>
+
+        <div className="rounded-lg border border-stone-200 bg-white p-5">
+          <h3 className="mb-1 text-sm font-semibold text-charcoal">Payment Configuration (Bank Transfer)</h3>
+          <p className="mb-4 text-xs text-charcoal-light">
+            Shown to customers at checkout when they choose Bank Transfer, and on their order confirmation
+            page.
+          </p>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <Input label="Bank Name" maxLength={150} value={form.bank_name} onChange={field('bank_name')} />
+            <Input
+              label="Account Holder Name"
+              maxLength={150}
+              value={form.bank_account_holder}
+              onChange={field('bank_account_holder')}
+            />
+            <Input
+              label="Account Number"
+              maxLength={50}
+              value={form.bank_account_number}
+              onChange={field('bank_account_number')}
+            />
+            <Input label="IBAN Number" maxLength={50} value={form.bank_iban} onChange={field('bank_iban')} />
+            <Input
+              label="Payment Receipt WhatsApp Number"
+              placeholder="923XXXXXXXXX"
+              maxLength={20}
+              value={form.payment_whatsapp_number}
+              onChange={field('payment_whatsapp_number')}
+            />
+          </div>
+          <div className="mt-4">
+            <Textarea
+              label="Additional Payment Instructions (optional)"
+              rows={3}
+              value={form.bank_additional_info}
+              onChange={field('bank_additional_info')}
+            />
           </div>
         </div>
 

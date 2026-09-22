@@ -6,6 +6,7 @@ import toast from 'react-hot-toast';
 import { useAsync } from '../hooks/useAsync';
 import { getAddresses } from '../api/addresses.api';
 import { checkout } from '../api/orders.api';
+import { getPublicSettings } from '../api/settings.api';
 import { addressSchema } from '../validation/address.schema';
 import { useCartStore, cartSubtotal } from '../store/useCartStore';
 import Button from '../components/ui/Button';
@@ -22,8 +23,10 @@ export default function CheckoutPage() {
   const [showNewAddress, setShowNewAddress] = useState(false);
   const [placing, setPlacing] = useState(false);
   const [orderPlaced, setOrderPlaced] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState('cod');
 
   const { data: addresses, loading } = useAsync(() => getAddresses(), []);
+  const { data: settings } = useAsync(() => getPublicSettings(), []);
   const {
     register,
     handleSubmit,
@@ -43,7 +46,7 @@ export default function CheckoutPage() {
   async function placeOrder(newAddressData) {
     setPlacing(true);
     try {
-      const payload = { couponCode };
+      const payload = { couponCode, paymentMethod };
       if (selectedAddressId && !showNewAddress) {
         payload.addressId = selectedAddressId;
       } else {
@@ -135,7 +138,71 @@ export default function CheckoutPage() {
             </div>
           )}
           <p className="text-xs text-stone-400">Shipping charges will be confirmed on your order confirmation.</p>
-          <p className="text-xs text-stone-400">Payment: Cash on Delivery</p>
+
+          <div className="space-y-2 border-t border-stone-200 pt-3">
+            <p className="text-sm font-medium text-charcoal">Payment Method</p>
+            <label className="flex cursor-pointer items-start gap-2 rounded-md border border-stone-200 bg-white p-3 text-sm has-checked:border-gold-400 has-checked:bg-gold-50">
+              <input
+                type="radio"
+                name="paymentMethod"
+                checked={paymentMethod === 'cod'}
+                onChange={() => setPaymentMethod('cod')}
+                className="mt-0.5"
+              />
+              <span>
+                <span className="block font-medium text-charcoal">Cash on Delivery</span>
+                <span className="block text-xs text-charcoal-light">Pay when your order arrives.</span>
+              </span>
+            </label>
+            <label className="flex cursor-pointer items-start gap-2 rounded-md border border-stone-200 bg-white p-3 text-sm has-checked:border-gold-400 has-checked:bg-gold-50">
+              <input
+                type="radio"
+                name="paymentMethod"
+                checked={paymentMethod === 'bank_transfer'}
+                onChange={() => setPaymentMethod('bank_transfer')}
+                className="mt-0.5"
+              />
+              <span>
+                <span className="block font-medium text-charcoal">Bank Transfer</span>
+                <span className="block text-xs text-charcoal-light">
+                  Transfer the amount, then send your receipt on WhatsApp.
+                </span>
+              </span>
+            </label>
+
+            {paymentMethod === 'bank_transfer' && (
+              <div className="space-y-1 rounded-md bg-stone-100 p-3 text-xs text-charcoal-light">
+                {settings?.bank_name && (
+                  <p>
+                    <span className="font-medium text-charcoal">Bank:</span> {settings.bank_name}
+                  </p>
+                )}
+                {settings?.bank_account_holder && (
+                  <p>
+                    <span className="font-medium text-charcoal">Account Holder:</span>{' '}
+                    {settings.bank_account_holder}
+                  </p>
+                )}
+                {settings?.bank_account_number && (
+                  <p>
+                    <span className="font-medium text-charcoal">Account Number:</span>{' '}
+                    {settings.bank_account_number}
+                  </p>
+                )}
+                {settings?.bank_iban && (
+                  <p>
+                    <span className="font-medium text-charcoal">IBAN:</span> {settings.bank_iban}
+                  </p>
+                )}
+                {settings?.bank_additional_info && <p>{settings.bank_additional_info}</p>}
+                <p className="pt-1 font-medium text-charcoal">
+                  After transferring, send your payment receipt on WhatsApp. Your order will be processed
+                  once the receipt is verified.
+                </p>
+              </div>
+            )}
+          </div>
+
           <Button
             className="w-full"
             loading={placing}

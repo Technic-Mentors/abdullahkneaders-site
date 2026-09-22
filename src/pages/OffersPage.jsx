@@ -67,8 +67,8 @@ export default function OffersPage() {
           </h1>
 
           <p className="mx-auto mt-4 max-w-lg text-sm text-charcoal-light sm:text-base">
-            Limited-time deals across our sports, fitness, and equestrian collection — save on the gear you trust for
-            training and competition.
+            Limited-time deals on our dough makers and accessories — save on the machine that makes kneading
+            effortless for roti, naan, pizza, and every family recipe.
           </p>
 
           <motion.div
@@ -105,7 +105,7 @@ export default function OffersPage() {
         ) : !offers?.length ? (
           <EmptyState
             title="No offers right now"
-            description="Check back soon for limited-time deals across our collection."
+            description="Check back soon for limited-time deals on our dough makers and accessories."
           />
         ) : (
           <>
@@ -118,12 +118,12 @@ export default function OffersPage() {
             >
               <span className="mb-1.5 flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-gold-600">
                 <span className="h-px w-5 bg-gold-400" />
-                Save on Your Gear
+                Save on Your Dough Maker
                 <span className="h-px w-5 bg-gold-400" />
               </span>
               <h2 className="font-serif text-xl text-charcoal sm:text-2xl">On-Sale Products</h2>
               <p className="mt-1.5 max-w-md text-sm text-charcoal-light">
-                Handpicked gear with special pricing — while stocks last.
+                Handpicked dough makers and accessories with special pricing — while stocks last.
               </p>
             </motion.div>
 
@@ -161,7 +161,7 @@ export default function OffersPage() {
         )}
       </section>
 
-      {/* ══════════════ FINAL CTA — no background, matches About/Home ══════════════ */}
+      {/* ══════════════ FINAL CTA ══════════════ */}
       {offers?.length > 0 && !loading && (
         <section className="relative overflow-hidden bg-cream">
           <motion.div
@@ -184,8 +184,8 @@ export default function OffersPage() {
             </h2>
 
             <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-charcoal-light sm:text-base">
-              Browse our entire collection of championship belts, weight lifting belts, equestrian gear, and buckles
-              &amp; swivels — with cash on delivery across Pakistan.
+              Browse our entire collection of dough makers and accessories — from compact 3.5 kg models to our
+              spacious 5 kg kneaders, with cash on delivery across Pakistan.
             </p>
 
             <div className="mt-6 flex flex-wrap items-center justify-center gap-3">

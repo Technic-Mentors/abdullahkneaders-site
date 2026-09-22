@@ -36,17 +36,17 @@ export default function BlogListPage() {
           <div className="mb-4 flex items-center justify-center gap-3">
             <span className="h-px w-10 bg-gradient-to-r from-transparent to-gold-600/70" />
             <span className="text-[10px] font-semibold uppercase tracking-[0.3em] text-gold-600">
-              Journal &amp; Guides
+              Recipes &amp; Guides
             </span>
             <span className="h-px w-10 bg-gradient-to-l from-transparent to-gold-600/70" />
           </div>
 
           <h1 className="font-serif text-4xl leading-tight text-charcoal sm:text-5xl lg:text-6xl">
-            Sports &amp; Training <span className="text-gold-600">Guides</span>
+            Dough Making <span className="text-gold-600">Guides</span>
           </h1>
 
           <p className="mx-auto mt-4 max-w-lg text-sm text-charcoal-light sm:text-base">
-            Tips, stories, and guidance for training, competition, and your gear.
+            Tips, recipes, and guidance for making perfect roti, naan, pizza, and pastry dough at home.
           </p>
 
           <div className="mx-auto mt-6 h-px w-24 bg-gradient-to-r from-transparent via-gold-500 to-transparent" />
@@ -59,7 +59,10 @@ export default function BlogListPage() {
             <Spinner />
           </div>
         ) : !data?.data?.length ? (
-          <EmptyState title="No articles yet" description="Check back soon for guides and tips." />
+          <EmptyState
+            title="No articles yet"
+            description="Check back soon for dough making guides, recipes, and kitchen tips."
+          />
         ) : (
           <>
             <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-3">

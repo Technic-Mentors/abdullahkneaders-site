@@ -23,7 +23,7 @@ export default function ProductGallery({ images = [] }) {
   return (
     <div>
       <div
-        className="relative aspect-square w-full cursor-zoom-in overflow-hidden rounded-lg bg-stone-100 ring-1 ring-gold-500/15"
+        className="group relative aspect-square w-full cursor-zoom-in overflow-hidden rounded-xl bg-stone-100 ring-1 ring-gold-500/15"
         onMouseEnter={() => setZooming(true)}
         onMouseLeave={() => setZooming(false)}
         onMouseMove={handleMouseMove}
@@ -44,16 +44,41 @@ export default function ProductGallery({ images = [] }) {
             )}
           />
         </AnimatePresence>
+
+        {images.length > 1 && (
+          <>
+            <button
+              type="button"
+              aria-label="Previous image"
+              onClick={() => setActiveIndex((activeIndex - 1 + images.length) % images.length)}
+              className="absolute left-2 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-stone-200 bg-white/90 text-charcoal shadow-sm transition-colors hover:bg-white hover:text-gold-600"
+            >
+              <ChevronIcon direction="left" />
+            </button>
+            <button
+              type="button"
+              aria-label="Next image"
+              onClick={() => setActiveIndex((activeIndex + 1) % images.length)}
+              className="absolute right-2 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-stone-200 bg-white/90 text-charcoal shadow-sm transition-colors hover:bg-white hover:text-gold-600"
+            >
+              <ChevronIcon direction="right" />
+            </button>
+            <span className="pointer-events-none absolute bottom-3 right-3 rounded-full bg-charcoal/70 px-2.5 py-1 text-[11px] font-medium text-white">
+              {activeIndex + 1} / {images.length}
+            </span>
+          </>
+        )}
       </div>
       {images.length > 1 && (
-        <div className="mt-3 flex gap-2 overflow-x-auto">
+        <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
           {images.map((img, i) => (
             <button
               key={img.id}
+              aria-label={`View image ${i + 1}`}
               onClick={() => setActiveIndex(i)}
               className={cn(
                 'h-16 w-16 shrink-0 overflow-hidden rounded-md border-2 bg-stone-100 transition-colors',
-                i === activeIndex ? 'border-gold-500' : 'border-transparent',
+                i === activeIndex ? 'border-gold-500' : 'border-transparent hover:border-gold-500/40',
               )}
             >
               <img src={assetUrl(img.image_path)} alt="" className="h-full w-full object-contain p-1" />
@@ -62,5 +87,21 @@ export default function ProductGallery({ images = [] }) {
         </div>
       )}
     </div>
+  );
+}
+
+function ChevronIcon({ direction = 'right' }) {
+  return (
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      className={cn(direction === 'left' ? 'rotate-90' : '-rotate-90')}
+    >
+      <path d="m6 9 6 6 6-6" />
+    </svg>
   );
 }

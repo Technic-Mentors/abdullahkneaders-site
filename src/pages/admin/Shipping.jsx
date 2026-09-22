@@ -135,7 +135,7 @@ export default function Shipping() {
         <h3 className="mb-4 text-sm font-semibold text-charcoal">General Settings</h3>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Input
-            label="Default Shipping Rate ($)"
+            label="Default Shipping Rate (Rs.)"
             type="number"
             step="0.01"
             min="0"
@@ -144,7 +144,7 @@ export default function Shipping() {
             onChange={(e) => setSettingsForm((f) => ({ ...f, defaultShippingRate: e.target.value }))}
           />
           <Input
-            label="Free Shipping Threshold ($)"
+            label="Free Shipping Threshold (Rs.)"
             type="number"
             step="0.01"
             min="0"
@@ -172,7 +172,7 @@ export default function Shipping() {
         emptyMessage="No shipping zones configured."
         columns={[
           { key: 'city', label: 'City' },
-          { key: 'charge', label: 'Charge', render: (row) => `$${row.charge}` },
+          { key: 'charge', label: 'Charge', render: (row) => `Rs. ${row.charge}` },
           {
             key: 'is_active',
             label: 'Status',
@@ -206,7 +206,7 @@ export default function Shipping() {
             required
           />
           <Input
-            label="Charge ($)"
+            label="Charge (Rs.)"
             type="number"
             step="0.01"
             min="0"

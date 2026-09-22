@@ -70,7 +70,7 @@ export default function ContactPage() {
   const [sent, setSent] = useState(false);
   const reduce = useReducedMotion();
 
-  const address = settings?.store_address || 'Address TBD';
+  const address = settings?.store_address || 'Address: Gondlanwala Rd, Gobandgarh, Gujranwala, 52250';
   const phone = settings?.store_phone;
   const email = settings?.store_email;
 
@@ -241,7 +241,7 @@ export default function ContactPage() {
             transition={{ duration: 0.7, delay: 0.9, ease: EASE }}
             className="mx-auto mt-3 max-w-xl text-sm text-charcoal-light"
           >
-            Questions about an order, sizing, or your gear? We&apos;re happy to help.
+            Questions about a dough maker, delivery, or payment? We&apos;re happy to help.
           </motion.p>
 
           <motion.div
@@ -507,7 +507,6 @@ export default function ContactPage() {
                         value={form.email}
                         onChange={(e) => setForm({ ...form, email: e.target.value })}
                       />
-                    
                     </motion.div>
                     <motion.div
                       initial={{ opacity: 0, y: 14 }}
@@ -556,7 +555,11 @@ export default function ContactPage() {
                       transition={{ duration: 0.5, delay: 0.7, ease: EASE }}
                       className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 pt-1 text-[10px] uppercase tracking-wider text-charcoal-light/70"
                     >
-                
+                      <span>Cash on Delivery</span>
+                      <span className="text-gold-500">·</span>
+                      <span>Free Delivery over Rs. 5,000</span>
+                      <span className="text-gold-500">·</span>
+                      <span>Trusted since 1958</span>
                     </motion.div>
                   </motion.div>
                 )}
@@ -610,7 +613,7 @@ export default function ContactPage() {
             transition={{ duration: 0.6, delay: 0.15, ease: EASE }}
             className="font-serif text-2xl leading-tight text-charcoal sm:text-3xl lg:text-4xl"
           >
-            Ready for Your Next <span className="text-gold-600">Competition?</span>
+            Ready to Make <span className="text-gold-600">Perfect Dough?</span>
           </motion.h2>
 
           <motion.p
@@ -620,7 +623,8 @@ export default function ContactPage() {
             transition={{ duration: 0.6, delay: 0.25, ease: EASE }}
             className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-charcoal-light sm:text-base"
           >
-            Browse our sports, fitness, and equestrian collection — shipping to the USA, Pakistan, and beyond.
+            Browse our dough makers and accessories — Cash on Delivery across Pakistan, delivering to 50+ cities
+            nationwide.
           </motion.p>
 
           <div className="mt-6 flex flex-wrap items-center justify-center gap-3">

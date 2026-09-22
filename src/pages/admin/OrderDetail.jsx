@@ -183,7 +183,9 @@ export default function OrderDetail() {
           {order.payment_method && (
             <div className="rounded-lg border border-stone-200 bg-white p-5">
               <h3 className="mb-3 text-sm font-semibold text-charcoal">Payment</h3>
-              <p className="text-sm text-charcoal-light">Method: {order.payment_method}</p>
+              <p className="text-sm text-charcoal-light">
+                Method: {order.payment_method === 'bank_transfer' ? 'Bank Transfer' : 'Cash on Delivery'}
+              </p>
             </div>
           )}
         </div>

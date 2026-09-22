@@ -31,7 +31,10 @@ const staggerContainer = {
   show: { transition: { staggerChildren: 0.08, delayChildren: 0.04 } },
 };
 
-/* ═══════════════ Word-by-word reveal (hero heading only) ═══════════════ */
+const FOUNDED = 1958;
+const YEARS = new Date().getFullYear() - FOUNDED;
+
+/* ═══════════════ Word-by-word reveal ═══════════════ */
 function RevealWords({ text, className = '', delay = 0, stagger = 0.04 }) {
   const reduce = useReducedMotion();
   if (reduce) return <span className={className}>{text}</span>;
@@ -59,7 +62,7 @@ function RevealWords({ text, className = '', delay = 0, stagger = 0.04 }) {
   );
 }
 
-/* ═══════════════ Inline Icons ═══════════════ */
+/* ═══════════════ Icons ═══════════════ */
 const IconQuality = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" className="h-5 w-5">
     <motion.path
@@ -71,14 +74,21 @@ const IconQuality = () => (
     />
   </svg>
 );
-const IconModesty = () => (
+const IconDough = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" className="h-5 w-5">
     <motion.path
-      d="M12 3c-3 4-6 7-6 11a6 6 0 0 0 12 0c0-4-3-7-6-11z"
+      d="M4 14c0-4 3-7 8-7s8 3 8 7c0 3-2 5-5 5H9c-3 0-5-2-5-5z"
       initial={{ pathLength: 0 }}
       whileInView={{ pathLength: 1 }}
       viewport={{ once: true, amount: 0 }}
       transition={{ duration: 1.1, ease: EASE }}
+    />
+    <motion.path
+      d="M9 4c1-1.5 5-1.5 6 0M12 7v-2"
+      initial={{ pathLength: 0 }}
+      whileInView={{ pathLength: 1 }}
+      viewport={{ once: true, amount: 0 }}
+      transition={{ duration: 0.7, delay: 0.7, ease: EASE }}
     />
   </svg>
 );
@@ -134,18 +144,34 @@ const IconPin = () => (
 
 /* ═══════════════ Data ═══════════════ */
 const VALUES = [
-  { icon: IconQuality, title: 'Authentic Quality', desc: 'Carefully sourced materials, chosen for durability and performance in training and competition.' },
-  { icon: IconModesty, title: 'Precision Craftsmanship', desc: 'Every piece of gear is built to exact specifications for competition and training, for lifters, athletes, and riders alike.' },
-  { icon: IconTruck, title: 'Cash on Delivery', desc: 'Available across Pakistan — pay only when your order arrives at your door.' },
-  { icon: IconPin, title: 'Worldwide Shipping', desc: 'From Pakistan to the USA and beyond, we ship wherever you train and compete.' },
+  {
+    icon: IconQuality,
+    title: 'Authentic Quality',
+    desc: 'Genuine, tested components chosen for durability and performance — so every batch of dough comes out right.',
+  },
+  {
+    icon: IconDough,
+    title: 'Effortless Kneading',
+    desc: 'One machine handles atta, maida, and qeema. From roti and naan to pizza and pastries — all in just five minutes.',
+  },
+  {
+    icon: IconTruck,
+    title: 'Cash on Delivery',
+    desc: 'Available across Pakistan — pay only when your dough maker arrives at your door, safe and inspected.',
+  },
+  {
+    icon: IconPin,
+    title: 'Nationwide Reach',
+    desc: 'From Karachi to Islamabad and beyond, we deliver to 50+ cities so every kitchen can knead with ease.',
+  },
 ];
 
 const VISION_MISSION = [
   {
     key: 'vision',
     eyebrow: 'Our Vision',
-    title: 'To become a globally trusted name in sports, fitness, and equestrian gear.',
-    desc: 'We envision a future where every athlete and rider trains and competes with gear that performs, lasts, and elevates their experience — no matter their budget.',
+    title: 'To make perfect dough effortless in every Pakistani kitchen.',
+    desc: 'We envision a future where no home cook has to spend hours kneading by hand — where a dependable dough maker sits in every kitchen, making roti, naan, and every family recipe simpler.',
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="h-6 w-6">
         <motion.path
@@ -170,8 +196,8 @@ const VISION_MISSION = [
   {
     key: 'mission',
     eyebrow: 'Our Mission',
-    title: 'Crafting premium, affordable gear for every athlete.',
-    desc: 'We are committed to sourcing authentic materials, ensuring fair prices, and delivering with care — so athletes and riders across the USA, Pakistan, and beyond can focus on their sport, not their gear.',
+    title: 'Crafting efficient, reliable dough makers for every home.',
+    desc: 'We are committed to designing dough makers that are efficient, dependable, and easy to use — simplifying daily cooking and saving families valuable time in the kitchen since 1958.',
     icon: (
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="h-6 w-6">
         <motion.circle
@@ -207,17 +233,17 @@ const VISION_MISSION = [
 ];
 
 const INTRO_PARAGRAPHS = [
-  'MA Universal was founded with a simple purpose: to equip athletes with gear that performs as hard as they train. Address TBD, we serve customers across the USA, Pakistan, and beyond, preparing for competition.',
-  'Every piece in our collection — from championship belts and weight lifting belts to equestrian gear, buckles, and swivels — is chosen for durability, precision, and performance under real training conditions.',
-  "We work closely with trusted material suppliers to make sure every stitch and buckle holds up to the long hours of lifting, riding, and competing that serious athletes demand. Nothing leaves our hands until it meets the standard we'd want for our own team.",
-  "We're proud to offer Cash on Delivery across Pakistan and ship internationally, including to the USA, so athletes everywhere can shop with confidence.",
+  `Dough maker innovation in Pakistan started with Abdullah Kneaders in ${FOUNDED}. From the very beginning, our mission has been to design efficient, reliable, and easy-to-use dough makers that simplify daily cooking for every home.`,
+  'Every machine we make — from our compact 3.5 kg model to our spacious 5 kg kneader — is built for one purpose: to give you perfectly kneaded dough without the mess, the tired arms, or the wasted time.',
+  'Whether you are preparing atta for roti, maida for naan and pastries, or minced mixtures like qeema, our dough makers deliver consistent texture and smooth results every single time. Add the flour, pour the water, close the lid, and start. Five minutes later, your dough is ready to cook.',
+  'We are proud to offer Cash on Delivery across Pakistan and deliver to 50+ cities nationwide, so every family can bring home a dough maker they can trust.',
 ];
 
 const STATS = [
-  { value: 200, suffix: '+', label: 'Happy Athletes' },
-  { value: 350, suffix: '+', label: 'Orders Delivered' },
-  { value: 30, suffix: '+', label: 'Cities Covered' },
-  { value: 95, suffix: '%', label: 'Satisfaction Rate' },
+  { value: 15000, suffix: '+', label: 'Happy Kitchens' },
+  { value: YEARS, suffix: '+', label: 'Years of Trust' },
+  { value: 50, suffix: '+', label: 'Cities Covered' },
+  { value: 98, suffix: '%', label: 'Satisfaction Rate' },
 ];
 
 /* ═══════════════ Scroll Progress Bar ═══════════════ */
@@ -558,7 +584,7 @@ export default function AboutPage() {
           </motion.div>
 
           <h1 className="font-serif text-4xl leading-tight text-charcoal sm:text-5xl lg:text-6xl">
-            <RevealWords text="About MA Universal" delay={0.35} stagger={0.08} />
+            <RevealWords text="About Abdullah Kneaders" delay={0.35} stagger={0.08} />
           </h1>
 
           <motion.p
@@ -567,7 +593,7 @@ export default function AboutPage() {
             transition={{ duration: 0.7, delay: 0.9, ease: EASE }}
             className="mx-auto mt-4 max-w-lg text-sm text-charcoal-light sm:text-base"
           >
-            Premium gear, engineered for training, competition, and everything in between.
+            Making dough effortless for every Pakistani kitchen since {FOUNDED}.
           </motion.p>
 
           <motion.div
@@ -607,7 +633,7 @@ export default function AboutPage() {
               transition={{ duration: 0.6, delay: 0.2, ease: EASE }}
               className="font-serif text-2xl leading-tight text-charcoal sm:text-3xl lg:text-4xl"
             >
-              Rooted in Passion, <span className="text-gold-600">Crafted with Care.</span>
+              Perfect Dough, <span className="text-gold-600">Every Single Time.</span>
             </motion.h2>
 
             <div className="mt-4 space-y-3">
@@ -698,7 +724,7 @@ export default function AboutPage() {
                   className="h-1.5 w-1.5 rounded-full bg-gold-400"
                 />
                 <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-cream">
-                  Crafted for Athletes
+                  Made for Every Kitchen
                 </span>
               </motion.div>
 
@@ -797,7 +823,7 @@ export default function AboutPage() {
           <SectionHeading
             eyebrow="What Drives Us"
             title="Our Vision & Mission"
-            subtitle="Two guiding principles behind every piece of gear we craft."
+            subtitle="Two guiding principles behind every dough maker we build."
           />
 
           <div className="relative mx-auto max-w-2xl">
@@ -880,8 +906,8 @@ export default function AboutPage() {
       <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
         <SectionHeading
           eyebrow="Our Collection"
-          title="Featured Products"
-          subtitle="A closer look at the gear athletes trust for training and competition."
+          title="Featured Dough Makers"
+          subtitle="A closer look at the machines families across Pakistan trust."
         />
 
         <AnimatePresence mode="wait">
@@ -1015,9 +1041,9 @@ export default function AboutPage() {
             transition={{ duration: 0.6, delay: 0.3, ease: EASE }}
             className="mt-3 text-sm leading-relaxed text-charcoal-light sm:text-base"
           >
-            Whether it&apos;s your first competition or your tenth, we want gearing up for it to be one less thing to
-            worry about. That means honest material descriptions, accurate sizing, and a team that answers when you
-            reach out — before, during, and after your order arrives.
+            Every Abdullah Dough Maker is thoughtfully designed and quality-checked before it reaches your kitchen.
+            From roti and naan to pizza and pastries — we ensure consistent texture, effortless kneading, and a
+            cleaner kitchen, every single day. If anything is not right, our team is one call away.
           </motion.p>
         </motion.div>
       </section>
@@ -1065,7 +1091,7 @@ export default function AboutPage() {
             transition={{ duration: 0.6, delay: 0.15, ease: EASE }}
             className="font-serif text-2xl leading-tight text-charcoal sm:text-3xl lg:text-4xl"
           >
-            Begin Your Performance <span className="text-gold-600">Journey</span> With Us
+            Bring Home the <span className="text-gold-600">All-in-One Dough Maker</span>
           </motion.h2>
 
           <motion.p
@@ -1075,12 +1101,12 @@ export default function AboutPage() {
             transition={{ duration: 0.6, delay: 0.25, ease: EASE }}
             className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-charcoal-light sm:text-base"
           >
-            Explore our collection of championship belts, lifting belts, equestrian gear, and buckles &amp; swivels —
-            thoughtfully crafted for your training and competition.
+            Explore our collection of dough makers built for atta, maida, and qeema — thoughtfully crafted for
+            everyday cooking, trusted by families across Pakistan since {FOUNDED}.
           </motion.p>
 
           <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-            <Link to="/category/men">
+            <Link to="/">
               <motion.div
                 initial={{ opacity: 0, y: 16 }}
                 whileInView={{ opacity: 1, y: 0 }}

@@ -1,5 +1,8 @@
 import { Link } from 'react-router-dom';
 import { TruckIcon, ReturnIcon, BadgeIcon, LockIcon } from '../icons/TrustIcons';
+import { useAsync } from '../../hooks/useAsync';
+import { getCategories } from '../../api/catalog.api';
+import { getPublicSettings } from '../../api/settings.api';
 
 const TRUST_POINTS = [
   { icon: TruckIcon, label: 'Cash on Delivery', description: 'Pay when it arrives' },
@@ -8,15 +11,18 @@ const TRUST_POINTS = [
   { icon: LockIcon, label: 'Secure Checkout', description: 'Your details stay safe' },
 ];
 
-// TODO: replace with MA Universal's real contact/social details once available.
-const WHATSAPP_NUMBER = '+923107524444';
-const PHONE_DISPLAY = '+706-939-1265';
-const FACEBOOK_URL = 'https://www.facebook.com/mauniversal.official/';
-const INSTAGRAM_URL = 'https://www.instagram.com/mauniversal/';
+const PHONE_DISPLAY = '+92 310 7777899';
+const WHATSAPP_NUMBER = '923107777899';
+const FACEBOOK_URL = 'https://www.facebook.com/CapitalDoughMaker';
+const INSTAGRAM_URL = 'https://www.instagram.com/capitaldoughmaker/';
 
 export default function Footer() {
+  const { data: categories } = useAsync(() => getCategories(), []);
+  const topCategories = (categories || []).filter((c) => !c.parent_id).slice(0, 4);
+  const { data: settings } = useAsync(() => getPublicSettings(), []);
+
   return (
-    <footer className="relative mt-2 overflow-hidden bg-charcoal text-stone-300">
+    <footer className="relative mt-2 overflow-hidden border-t border-stone-200 bg-white text-charcoal">
       {/* Gold top accent line */}
       <div className="h-px w-full bg-gradient-to-r from-transparent via-gold-500 to-transparent" />
 
@@ -41,17 +47,17 @@ export default function Footer() {
             <Link to="/" className="mb-3 inline-flex items-center gap-2.5 group">
               <img
                 src="/logo.png"
-                alt="MA Universal"
+                alt="Abdullah Kneaders"
                 className="h-20 w-30 transition-transform duration-300 group-hover:scale-105"
               />
               <div>
-             
+
               </div>
             </Link>
 
-            <p className="text-xs leading-relaxed text-stone-400">
-              Sports, fitness, and equestrian gear — championship belts, weight lifting belts, equestrian
-              gear, and buckles &amp; swivels, built for performance and durability.
+            <p className="text-xs leading-relaxed text-charcoal-light">
+              Crafting efficient, reliable dough makers since 1958 — perfect atta, maida, and qeema dough
+              every time, with Cash on Delivery available across Pakistan.
             </p>
 
             {/* Social icons */}
@@ -73,10 +79,12 @@ export default function Footer() {
               Shop
             </h4>
             <ul className="space-y-1.5 text-sm">
-              <FooterLink to="/category/championship-belts">Championship Belts</FooterLink>
-              <FooterLink to="/category/weight-lifting-belts">Weight Lifting Belts</FooterLink>
-              <FooterLink to="/category/equestrian-gear">Equestrian Gear</FooterLink>
-              <FooterLink to="/category/buckles-swivels">Buckles &amp; Swivels</FooterLink>
+              {topCategories.map((category) => (
+                <FooterLink key={category.id} to={`/category/${category.slug}`}>
+                  {category.name}
+                </FooterLink>
+              ))}
+              <FooterLink to="/benefits">Benefits</FooterLink>
               <FooterLink to="/offers">Special Offers</FooterLink>
               <FooterLink to="/blog">Guides &amp; Journal</FooterLink>
             </ul>
@@ -99,13 +107,13 @@ export default function Footer() {
 
             {/* Contact block */}
             <div className="mt-3 space-y-1 border-t border-gold-500/15 pt-3">
-              <p className="flex items-start gap-1.5 text-[11px] text-stone-400">
+              <p className="flex items-start gap-1.5 text-[11px] text-charcoal-light">
                 <PinIconSmall />
-                <span>MOZO, Kotli Loharan, Tehsil & District Sialkot, Sialkot.</span>
+                <span>{settings?.store_address || 'Gondlanwala Rd, Gobandgarh, Gujranwala, 52250'}</span>
               </p>
               <a
-                href={`tel:${WHATSAPP_NUMBER}`}
-                className="flex items-center gap-1.5 text-[11px] text-stone-400 transition-colors hover:text-gold-400"
+                href={`tel:${PHONE_DISPLAY.replace(/\s+/g, '')}`}
+                className="flex items-center gap-1.5 text-[11px] text-charcoal-light transition-colors hover:text-gold-600"
               >
                 <PhoneIconSmall />
                 <span>{PHONE_DISPLAY}</span>
@@ -122,12 +130,12 @@ export default function Footer() {
             <ul className="space-y-2">
               {TRUST_POINTS.map(({ icon: Icon, label, description }) => (
                 <li key={label} className="flex items-start gap-2.5">
-                  <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-gold-500/20 bg-gold-500/5 text-gold-400">
+                  <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-gold-500/25 bg-gold-500/5 text-gold-600">
                     <Icon />
                   </span>
                   <span>
-                    <p className="text-xs font-medium text-cream">{label}</p>
-                    <p className="text-[11px] text-stone-500">{description}</p>
+                    <p className="text-xs font-medium text-charcoal">{label}</p>
+                    <p className="text-[11px] text-charcoal-light">{description}</p>
                   </span>
                 </li>
               ))}
@@ -138,18 +146,18 @@ export default function Footer() {
 
       {/* ══════════════ BOTTOM BAR ══════════════ */}
       <div className="relative border-t border-gold-500/15">
-        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-2 px-4 py-3 text-[11px] text-stone-500 sm:flex-row sm:px-6">
+        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-2 px-4 py-3 text-[11px] text-charcoal-light sm:flex-row sm:px-6">
           <p className="text-center sm:text-left">
-            © {new Date().getFullYear()} MA Universal. All rights reserved.
+            © {new Date().getFullYear()} Abdullah Kneaders. All rights reserved.
           </p>
           <p className="flex items-center justify-center gap-1 text-center">
             Developed with{' '}
-            <HeartIcon className="inline-block h-2.5 w-2.5 text-red-400" filled /> by{' '}
+            <HeartIcon className="inline-block h-2.5 w-2.5 text-red-500" filled /> by{' '}
             <a
               href="https://technicmentors.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="font-medium text-stone-400 transition-colors hover:text-gold-300"
+              className="font-medium text-charcoal transition-colors hover:text-gold-600"
             >
               Technic Mentors
             </a>
@@ -166,9 +174,9 @@ function FooterLink({ to, children }) {
     <li>
       <Link
         to={to}
-        className="group inline-flex items-center gap-1 text-stone-400 transition-colors hover:text-gold-300"
+        className="group inline-flex items-center gap-1 text-charcoal-light transition-colors hover:text-gold-600"
       >
-        <span className="h-px w-0 bg-gold-400 transition-all duration-300 group-hover:w-2.5" />
+        <span className="h-px w-0 bg-gold-500 transition-all duration-300 group-hover:w-2.5" />
         {children}
       </Link>
     </li>
@@ -182,7 +190,7 @@ function SocialLink({ href, label, icon }) {
       target="_blank"
       rel="noopener noreferrer"
       aria-label={label}
-      className="flex h-8 w-8 items-center justify-center rounded-full border border-gold-500/20 bg-gold-500/5 text-stone-300 transition-all duration-300 hover:scale-110 hover:border-gold-400/50 hover:bg-gold-500/10 hover:text-gold-400"
+      className="flex h-8 w-8 items-center justify-center rounded-full border border-gold-500/25 bg-gold-500/5 text-charcoal transition-all duration-300 hover:scale-110 hover:border-gold-500/50 hover:bg-gold-500/10 hover:text-gold-600"
     >
       {icon}
     </a>

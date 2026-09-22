@@ -1,6 +1,16 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { AnimatePresence, motion, useScroll, useTransform, useSpring, useInView } from 'framer-motion';
+import {
+  AnimatePresence,
+  MotionConfig,
+  animate,
+  motion,
+  useInView,
+  useMotionValue,
+  useScroll,
+  useSpring,
+  useTransform,
+} from 'framer-motion';
 import { useAsync } from '../hooks/useAsync';
 import { getBanners } from '../api/banners.api';
 import { getFeaturedProducts, getCategories, getProducts } from '../api/catalog.api';
@@ -9,375 +19,1368 @@ import ProductCardSkeleton from '../components/product/ProductCardSkeleton';
 import Button from '../components/ui/Button';
 import { assetUrl } from '../utils/media';
 
-const TESTIMONIALS = [
-  { name: 'Ahmed R.', location: 'Lahore, Pakistan', quote: 'The championship belt quality exceeded my expectations. Truly premium leather.', rating: 5 },
-  { name: 'Mike D.', location: 'Austin, TX', quote: 'Ordered a lifting belt for competition prep — arrived fast and the quality is top-notch.', rating: 5 },
-  { name: 'Sarah K.', location: 'Los Angeles, CA', quote: 'My saddle pad arrived beautifully packaged. Great quality for the price.', rating: 5 },
-];
-
-const INSTAGRAM_REEL_URLS = [
-  'https://www.instagram.com/reel/DWQ8Im9ETEr/',
-  'https://www.instagram.com/reel/DXgO_f0kiTC/',
-  'https://www.instagram.com/reel/Dc1WhJzlHig/',
-];
-
-const INSTAGRAM_POST_URLS = [
-  'https://www.instagram.com/p/DXWcRmwjG2r/',
-  'https://www.instagram.com/p/DWJL9_Sk1ZA/',
-  'https://www.instagram.com/p/DU76pjviKKJ/',
-];
+/* ═══════════════════════════════════════════════════════════
+   ABDULLAH KNEADERS — HOME PAGE (compact, animated)
+   ═══════════════════════════════════════════════════════════ */
 
 const EASE = [0.22, 1, 0.36, 1];
 const SPRING = { type: 'spring', stiffness: 260, damping: 24, mass: 0.9 };
-const SPRING_SOFT = { type: 'spring', stiffness: 160, damping: 22 };
-
-const fadeUp = {
-  hidden: { opacity: 0, y: 24 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: EASE } },
-};
-
-const staggerContainer = {
-  hidden: {},
-  show: { transition: { staggerChildren: 0.08, delayChildren: 0.04 } },
-};
-
-const heroContainer = {
-  hidden: {},
-  show: { transition: { staggerChildren: 0.12, delayChildren: 0.08 } },
-};
-
-const heroItem = {
-  hidden: { opacity: 0, y: 16 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.55, ease: EASE } },
-};
-
 const SLIDE_INTERVAL_MS = 5500;
 
-/* ═══════════════ SectionHeading ═══════════════ */
-function SectionHeading({ eyebrow, title, subtitle, align = 'center', dark = false }) {
-  const alignCls = align === 'center' ? 'text-center items-center' : 'text-left items-start';
+const FOUNDED = 1958;
+const YEARS = new Date().getFullYear() - FOUNDED;
+const PHONE = '+92-310-7777899';
+const PHONE_HREF = 'tel:+923107777899';
+const FACEBOOK_URL = 'https://www.facebook.com/CapitalDoughMaker';
+const INSTAGRAM_URL = 'https://www.instagram.com/capitaldoughmaker/';
+const VIDEO_ID = 'MwPTYFm1TEY';
+const LINKS = { about: '/about', contact: '/contact', complaint: '/complaint' };
+
+const FOCUS =
+  'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold-500';
+
+const MARQUEE_ITEMS = [
+  'Free delivery over Rs. 5,000',
+  'Cash on Delivery',
+  `Making dough easier since ${FOUNDED}`,
+  '₨ 200 off on bank transfer',
+  'Atta, maida and qeema',
+  'Trusted by 15,000+ kitchens',
+  'Easy returns',
+  'Perfect dough every time',
+];
+
+const STEPS = [
+  { icon: 'flour', title: 'Add the flour', text: 'Put a measured quantity of atta into the mixing chamber.' },
+  { icon: 'water', title: 'Pour the water', text: 'Use the measuring cup that comes with your machine.' },
+  {
+    icon: 'timer',
+    title: 'Close the lid and start',
+    text: 'Run the machine for five minutes. Your dough is ready to cook.',
+  },
+];
+
+const KNEAD = [
+  {
+    key: 'atta',
+    label: 'Atta',
+    color: '#d8b98c',
+    image: '/roti.jpg',
+    title: 'Soft dough for roti and chapati',
+    text: 'Add measured atta and water, then let the machine do the work. Every batch comes out with the same softness.',
+    uses: ['Roti', 'Chapati', 'Paratha'],
+  },
+  {
+    key: 'maida',
+    label: 'Maida',
+    color: '#f2e7d2',
+    image: '/bakery-products.jpg',
+    title: 'Smooth dough for naan and bakes',
+    text: 'From naan and pizza to pastries and cookies, maida dough gets an even, consistent texture.',
+    uses: ['Naan', 'Pizza', 'Pastry', 'Cookies'],
+  },
+  {
+    key: 'qeema',
+    label: 'Qeema',
+    color: '#b8613f',
+    image: '/qeema.avif',
+    title: 'Even mixing for minced mixtures',
+    text: 'Minced mixtures are blended thoroughly, without you getting your hands messy.',
+    uses: ['Kebab mixes', 'Koftay'],
+  },
+];
+const CHIP_SLOTS = [
+  'left-0 top-[10%]',
+  'right-0 top-[26%]',
+  'left-[2%] bottom-[16%]',
+  'right-[4%] bottom-[6%]',
+];
+
+const SIZES = [
+  {
+    key: '3.5',
+    label: '3.5 kg',
+    fill: 0.6,
+    models: ['AE-900A'],
+    text: 'A compact machine for everyday family cooking.',
+  },
+  {
+    key: '5',
+    label: '5 kg',
+    fill: 0.88,
+    models: ['AE-221'],
+    text: 'More capacity for bigger batches and bigger households.',
+  },
+];
+
+const MILESTONES = [
+  {
+    icon: 'shield',
+    title: `Pioneers since ${FOUNDED}`,
+    text: 'Abdullah Kneaders introduced the dough maker to Pakistani homes and changed how families prepare dough.',
+  },
+  {
+    icon: 'truck',
+    title: 'Delivered across Pakistan',
+    text: 'Customers in every major city can order online and have their machine delivered to the door.',
+  },
+  {
+    icon: 'globe',
+    title: 'Now growing in the UAE',
+    text: 'We are expanding through physical outlets and retail partners, bringing modern kneading to a wider audience.',
+  },
+];
+
+const TESTIMONIALS = [
+  {
+    name: 'Ayesha',
+    location: 'Karachi',
+    quote:
+      'This dough maker is absolutely amazing! The quality feels premium, and it saves me so much time in the kitchen. I am very happy with my purchase.',
+  },
+  {
+    name: 'Ume Aiman',
+    location: 'Lahore',
+    quote:
+      'Smooth kneading and very easy to use! It handles atta, maida, and even qeema perfectly. The quality is excellent and customer support was extremely helpful.',
+  },
+  {
+    name: 'Sara',
+    location: 'Islamabad',
+    quote:
+      'Cooking has become so much easier since I started using this dough maker. It is user-friendly, neatly packaged, and arrived right on time.',
+  },
+];
+
+const FAQS = [
+  {
+    q: 'How long does it take to knead dough?',
+    a: 'Add the flour and water, close the lid and start the machine. Five minutes later your dough is ready to cook.',
+  },
+  {
+    q: 'What can I make with it?',
+    a: 'Atta for roti and chapati, maida for naan, pizza, pastries and cookies, and minced qeema mixtures.',
+  },
+  { q: 'How much water should I add?', a: 'Use the measuring cup that comes with your machine to pour the water.' },
+  {
+    q: 'Which size should I choose?',
+    a: 'We offer a 3.5 kg model (AE-900A) and a 5 kg model (AE-221). Pick the size that suits your household.',
+  },
+  {
+    q: 'How do delivery and payment work?',
+    a: 'Delivery is free on orders over Rs. 5,000, and Cash on Delivery is available nationwide. Pay by direct bank transfer and get ₨ 200 off.',
+  },
+  {
+    q: 'Who do I contact if something is wrong?',
+    a: `Call us on ${PHONE} between 08:00 and 17:00, or send a message through our contact and complaint pages.`,
+  },
+];
+
+/* ═══════════════ Motion helpers ═══════════════ */
+const STAGGER = { hidden: {}, show: { transition: { staggerChildren: 0.05 } } };
+const ITEM = {
+  hidden: { opacity: 0, y: 18 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.45, ease: EASE } },
+};
+const REVEAL = {
+  up: { hidden: { opacity: 0, y: 22 }, show: { opacity: 1, y: 0 } },
+  left: { hidden: { opacity: 0, x: -28 }, show: { opacity: 1, x: 0 } },
+  right: { hidden: { opacity: 0, x: 28 }, show: { opacity: 1, x: 0 } },
+  scale: { hidden: { opacity: 0, scale: 0.94 }, show: { opacity: 1, scale: 1 } },
+};
+
+function Reveal({ children, variant = 'up', delay = 0, className = '' }) {
   return (
     <motion.div
-      variants={fadeUp}
+      variants={REVEAL[variant]}
       initial="hidden"
       whileInView="show"
-      viewport={{ once: true, amount: 0.4 }}
-      className={`mb-5 flex flex-col ${alignCls}`}
+      viewport={{ once: true, amount: 0.2 }}
+      transition={{ duration: 0.6, ease: EASE, delay }}
+      className={className}
     >
-      {eyebrow && (
-        <motion.span
-          variants={fadeUp}
-          className="mb-1.5 flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-gold-600"
-        >
-          <motion.span
-            initial={{ scaleX: 0 }}
-            whileInView={{ scaleX: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7, ease: EASE, delay: 0.15 }}
-            className="h-px w-5 origin-right bg-gold-400"
-          />
-          {eyebrow}
-          <motion.span
-            initial={{ scaleX: 0 }}
-            whileInView={{ scaleX: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7, ease: EASE, delay: 0.15 }}
-            className="h-px w-5 origin-left bg-gold-400"
-          />
-        </motion.span>
-      )}
-      <motion.h2
-        initial={{ opacity: 0, y: 12, filter: 'blur(6px)' }}
-        whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.7, ease: EASE, delay: 0.08 }}
-        className={`font-serif text-xl sm:text-2xl ${dark ? 'text-cream' : 'text-charcoal'}`}
-      >
-        {title}
-      </motion.h2>
-      {subtitle && (
-        <motion.p
-          initial={{ opacity: 0, y: 8 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, ease: EASE, delay: 0.18 }}
-          className={`mt-1.5 max-w-md text-sm ${dark ? 'text-stone-300' : 'text-charcoal-light'}`}
-        >
-          {subtitle}
-        </motion.p>
-      )}
+      {children}
     </motion.div>
   );
 }
 
-/* ═══════════════ Stars ═══════════════ */
-function Stars({ count = 5 }) {
+function WordReveal({ text, as: Tag = 'span', className = '', delay = 0 }) {
   return (
-    <div className="flex justify-center gap-0.5">
-      {Array.from({ length: count }).map((_, i) => (
-        <motion.svg
+    <Tag className={className}>
+      {text.split(' ').map((w, i) => (
+        <span key={i} className="mr-[0.25em] -mb-[0.12em] inline-block overflow-hidden pb-[0.12em] align-bottom">
+          <motion.span
+            className="inline-block"
+            initial={{ y: '110%' }}
+            whileInView={{ y: 0 }}
+            viewport={{ once: true, amount: 0.6 }}
+            transition={{ duration: 0.6, ease: EASE, delay: delay + i * 0.05 }}
+          >
+            {w}
+          </motion.span>
+        </span>
+      ))}
+    </Tag>
+  );
+}
+
+function Magnetic({ children }) {
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  const sx = useSpring(x, { stiffness: 220, damping: 16 });
+  const sy = useSpring(y, { stiffness: 220, damping: 16 });
+  return (
+    <motion.div
+      style={{ x: sx, y: sy }}
+      onMouseMove={(e) => {
+        const r = e.currentTarget.getBoundingClientRect();
+        x.set((e.clientX - r.left - r.width / 2) * 0.22);
+        y.set((e.clientY - r.top - r.height / 2) * 0.3);
+      }}
+      onMouseLeave={() => {
+        x.set(0);
+        y.set(0);
+      }}
+      className="inline-block"
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+function TiltCard({ children }) {
+  const px = useMotionValue(0);
+  const py = useMotionValue(0);
+  const rotateX = useSpring(useTransform(py, [-0.5, 0.5], [6, -6]), { stiffness: 200, damping: 20 });
+  const rotateY = useSpring(useTransform(px, [-0.5, 0.5], [-6, 6]), { stiffness: 200, damping: 20 });
+  return (
+    <motion.div
+      style={{ rotateX, rotateY, transformPerspective: 900 }}
+      onMouseMove={(e) => {
+        const r = e.currentTarget.getBoundingClientRect();
+        px.set((e.clientX - r.left) / r.width - 0.5);
+        py.set((e.clientY - r.top) / r.height - 0.5);
+      }}
+      onMouseLeave={() => {
+        px.set(0);
+        py.set(0);
+      }}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+/* ═══════════════ Icons ═══════════════ */
+const ICONS = {
+  arrow: <path d="M5 12h14M13 6l6 6-6 6" />,
+  plus: <path d="M12 5v14M5 12h14" />,
+  play: <path d="M8 5v14l11-7L8 5Z" fill="currentColor" />,
+  left: <path d="M15 18l-6-6 6-6" />,
+  right: <path d="M9 18l6-6-6-6" />,
+  flour: (
+    <>
+      <path d="M6 8h12l1 12H5L6 8Z" />
+      <path d="M9 8V5h6v3M9 13h6" />
+    </>
+  ),
+  water: <path d="M12 3s6 6.2 6 10.5a6 6 0 0 1-12 0C6 9.2 12 3 12 3Z" />,
+  timer: (
+    <>
+      <circle cx="12" cy="13" r="8" />
+      <path d="M12 9v4l2.5 2.5M9 2h6" />
+    </>
+  ),
+  truck: (
+    <>
+      <path d="M2 6h11v11H2zM13 10h4l4 4v3h-8z" />
+      <circle cx="6.5" cy="19" r="1.8" />
+      <circle cx="16.5" cy="19" r="1.8" />
+    </>
+  ),
+  cash: (
+    <>
+      <rect x="2" y="6" width="20" height="12" rx="2" />
+      <circle cx="12" cy="12" r="2.5" />
+    </>
+  ),
+  tag: (
+    <>
+      <path d="M12.5 2H4a2 2 0 0 0-2 2v8.5a2 2 0 0 0 .59 1.41l9 9a2 2 0 0 0 2.82 0l7.5-7.5a2 2 0 0 0 0-2.82l-9-9A2 2 0 0 0 12.5 2Z" />
+      <circle cx="7.5" cy="7.5" r="1.5" fill="currentColor" stroke="none" />
+    </>
+  ),
+  shield: (
+    <>
+      <path d="M12 3l7 3v6c0 4.5-3 8-7 9-4-1-7-4.5-7-9V6l7-3z" />
+      <path d="m9 12 2 2 4-4" />
+    </>
+  ),
+  globe: (
+    <>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18" />
+    </>
+  ),
+  users: (
+    <>
+      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+      <circle cx="9" cy="7" r="4" />
+      <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
+    </>
+  ),
+  phone: (
+    <path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2Z" />
+  ),
+  facebook: <path d="M14 8h3V4h-3a4 4 0 0 0-4 4v3H7v4h3v6h4v-6h3l1-4h-4V8.5a.5.5 0 0 1 .5-.5Z" />,
+  instagram: (
+    <>
+      <rect x="3" y="3" width="18" height="18" rx="5" />
+      <circle cx="12" cy="12" r="4" />
+      <circle cx="17.5" cy="6.5" r="1" fill="currentColor" />
+    </>
+  ),
+};
+
+function Icon({ name, className = 'h-5 w-5' }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      aria-hidden
+    >
+      {ICONS[name]}
+    </svg>
+  );
+}
+
+function Star({ className = 'h-3.5 w-3.5 fill-gold-500' }) {
+  return (
+    <svg viewBox="0 0 20 20" className={className} aria-hidden>
+      <path d="M10 1.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L10 14.9 4.8 17.6l1-5.8L1.5 7.7l5.9-.9L10 1.5z" />
+    </svg>
+  );
+}
+
+/* ═══════════════ Small building blocks ═══════════════ */
+function Badge({ children, dark = false, className = '' }) {
+  return (
+    <span
+      className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium ${
+        dark
+          ? 'border-gold-400/30 bg-gold-400/10 text-gold-300'
+          : 'border-gold-500/25 bg-gold-500/10 text-gold-600'
+      } ${className}`}
+    >
+      <motion.span
+        className="h-1.5 w-1.5 rounded-full bg-current"
+        animate={{ opacity: [0.4, 1, 0.4] }}
+        transition={{ duration: 2, repeat: Infinity }}
+      />
+      {children}
+    </span>
+  );
+}
+
+function SectionHeading({ title, subtitle, badge, dark = false }) {
+  return (
+    <div className="mb-4 max-w-xl">
+      {badge && <Badge dark={dark}>{badge}</Badge>}
+      <WordReveal
+        as="h2"
+        text={title}
+        className={`mt-2 block font-serif text-2xl leading-tight sm:text-3xl ${
+          dark ? 'text-cream' : 'text-charcoal'
+        }`}
+      />
+      {subtitle && (
+        <Reveal delay={0.15}>
+          <p className={`mt-1.5 text-sm ${dark ? 'text-stone-300' : 'text-charcoal-light'}`}>
+            {subtitle}
+          </p>
+        </Reveal>
+      )}
+    </div>
+  );
+}
+
+function ScrollProgress() {
+  const { scrollYProgress } = useScroll();
+  const scaleX = useSpring(scrollYProgress, { stiffness: 140, damping: 30 });
+  return (
+    <motion.div
+      aria-hidden
+      style={{ scaleX }}
+      className="fixed inset-x-0 top-0 z-[60] h-0.5 origin-left bg-gold-500"
+    />
+  );
+}
+
+function Marquee({ items, speed = 40, reverse = false }) {
+  const list = [...items, ...items];
+  return (
+    <div className="overflow-hidden">
+      <motion.div
+        className="flex w-max whitespace-nowrap"
+        animate={{ x: reverse ? ['-50%', '0%'] : ['0%', '-50%'] }}
+        transition={{ duration: speed, ease: 'linear', repeat: Infinity }}
+      >
+        {list.map((t, i) => (
+          <span key={i} className="flex items-center gap-8 pr-8 font-serif text-base italic text-cream/90">
+            {t}
+            <Star className="h-3 w-3 fill-gold-500" />
+          </span>
+        ))}
+      </motion.div>
+    </div>
+  );
+}
+
+/* ═══════════════ Hero visual (animated kneader) ═══════════════ */
+function HeroVisual() {
+  const chips = [
+    { label: 'Roti', cls: 'left-0 top-[20%]', d: 0 },
+    { label: 'Naan', cls: 'right-0 top-[32%]', d: 0.6 },
+    { label: 'Pizza', cls: 'left-[2%] bottom-[8%]', d: 1.2 },
+    { label: 'Pastry', cls: 'right-[4%] bottom-[14%]', d: 1.8 },
+  ];
+  return (
+    <div
+      className="relative mx-auto aspect-square w-full max-w-[280px] sm:max-w-[340px] lg:max-w-[400px]"
+      aria-hidden
+    >
+      <motion.div
+        className="absolute inset-[3%] rounded-full border border-dashed border-gold-400/40"
+        animate={{ rotate: 360 }}
+        transition={{ duration: 50, ease: 'linear', repeat: Infinity }}
+      />
+      <div className="absolute inset-[14%] rounded-full bg-gold-500/20 blur-2xl" />
+      <motion.div
+        className="absolute inset-[12%] rounded-full border border-white/10"
+        animate={{ scale: [1, 1.05, 1] }}
+        transition={{ duration: 4, ease: 'easeInOut', repeat: Infinity }}
+      />
+
+      <div className="absolute left-1/2 top-[8%] z-20 flex h-[11%] w-[44%] -translate-x-1/2 items-center justify-between rounded-2xl bg-gradient-to-b from-gold-400 to-gold-600 px-3 shadow-lg shadow-gold-500/30">
+        <span className="text-xs font-semibold text-white">5 min</span>
+        <motion.span
+          className="h-2 w-2 rounded-full bg-white"
+          animate={{ opacity: [0.3, 1, 0.3] }}
+          transition={{ duration: 1.2, repeat: Infinity }}
+        />
+      </div>
+
+      <motion.div
+        className="absolute left-[calc(50%-5px)] top-[18%] z-10 h-[38%] w-2.5 origin-top rounded-full bg-gradient-to-b from-stone-200 to-stone-400"
+        animate={{ rotate: [-16, 16, -16] }}
+        transition={{ duration: 3.4, ease: 'easeInOut', repeat: Infinity }}
+      >
+        <span className="absolute -bottom-2 left-1/2 h-7 w-7 -translate-x-1/2 rounded-full border-[5px] border-stone-300 border-t-transparent" />
+      </motion.div>
+
+      <div className="absolute bottom-[14%] left-[14%] right-[14%] z-10 h-[36%] overflow-hidden rounded-b-[999px] rounded-t-2xl border-2 border-gold-300/50 bg-white/5 backdrop-blur-sm">
+        <motion.div
+          className="absolute bottom-0 left-[5%] right-[5%] bg-cream"
+          animate={{
+            height: ['52%', '70%', '52%'],
+            borderRadius: [
+              '48% 52% 30% 30% / 70% 65% 35% 35%',
+              '55% 45% 30% 30% / 60% 70% 30% 40%',
+              '48% 52% 30% 30% / 70% 65% 35% 35%',
+            ],
+          }}
+          transition={{ duration: 3.4, ease: 'easeInOut', repeat: Infinity }}
+        />
+      </div>
+
+      {Array.from({ length: 8 }).map((_, i) => (
+        <motion.span
           key={i}
-          viewBox="0 0 20 20"
-          className="h-3.5 w-3.5 fill-gold-500"
-          initial={{ opacity: 0, scale: 0.5, rotate: -45 }}
-          whileInView={{ opacity: 1, scale: 1, rotate: 0 }}
-          viewport={{ once: true }}
-          transition={{ ...SPRING, delay: i * 0.06 }}
+          className="absolute z-20 h-1.5 w-1.5 rounded-full bg-cream/70"
+          style={{ left: `${28 + ((i * 17) % 44)}%`, bottom: '46%' }}
+          animate={{ y: [0, -60 - (i % 3) * 20], opacity: [0, 0.9, 0] }}
+          transition={{ duration: 2.6 + (i % 4) * 0.4, repeat: Infinity, delay: i * 0.35, ease: 'easeOut' }}
+        />
+      ))}
+
+      {chips.map((c) => (
+        <motion.span
+          key={c.label}
+          className={`absolute z-30 rounded-full border border-white/15 bg-charcoal/70 px-3 py-1 text-xs font-medium text-cream backdrop-blur ${c.cls}`}
+          animate={{ y: [0, -8, 0] }}
+          transition={{ duration: 4, ease: 'easeInOut', repeat: Infinity, delay: c.d }}
         >
-          <path d="M10 1.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L10 14.9 4.8 17.6l1-5.8L1.5 7.7l5.9-.9L10 1.5z" />
-        </motion.svg>
+          {c.label}
+        </motion.span>
       ))}
     </div>
   );
 }
 
-/* ═══════════════ Stat Counter ═══════════════ */
-function StatCounter({ icon, value, suffix = '', label, delay = 0 }) {
-  const [count, setCount] = useState(0);
+/* ═══════════════ Hero ═══════════════ */
+function Hero({ slides, active, setActive, firstCategoryLink }) {
   const ref = useRef(null);
-  const inView = useInView(ref, { once: true, amount: 0.4 });
+  const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end start'] });
+  const glowY = useTransform(scrollYProgress, [0, 1], [0, 90]);
+  const current = slides.length ? slides[active % slides.length] : null;
+  const bannerLink = current?.link_url?.startsWith('/') ? current.link_url : firstCategoryLink;
+  const go = (n) => setActive((n + slides.length) % slides.length);
 
-  useEffect(() => {
-    if (!inView) return;
-    const duration = 1600;
-    const start = performance.now();
-    let raf;
-    const tick = (now) => {
-      const progress = Math.min((now - start) / duration, 1);
-      const eased = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
-      setCount(Math.floor(eased * value));
-      if (progress < 1) raf = requestAnimationFrame(tick);
-      else setCount(value);
-    };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
-  }, [inView, value]);
-
-  return (
-    <motion.div
-      ref={ref}
-      initial={{ opacity: 0, y: 24, scale: 0.94 }}
-      whileInView={{ opacity: 1, y: 0, scale: 1 }}
-      whileHover={{ y: -6, scale: 1.03, transition: SPRING }}
-      viewport={{ once: true, amount: 0.3 }}
-      transition={{ duration: 0.6, delay, ease: EASE }}
-      className="group relative flex flex-col items-center gap-2 overflow-hidden rounded-lg bg-gradient-to-br from-gold-300 to-gold-500 px-4 py-6 text-center shadow-sm transition-all duration-300 hover:shadow-xl hover:shadow-gold-500/40 hover:from-gold-200 hover:to-gold-400"
-    >
-      <motion.div
-        aria-hidden
-        className="pointer-events-none absolute -top-6 -right-6 h-24 w-24 rounded-full bg-white/25 blur-xl"
-        animate={{ scale: [1, 1.15, 1], opacity: [0.7, 1, 0.7] }}
-        transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut', delay }}
-      />
-      <motion.span
-        className="relative flex h-10 w-10 items-center justify-center rounded-full bg-white/20 text-white"
-        whileHover={{ rotate: [0, -8, 8, 0], transition: { duration: 0.5 } }}
-      >
-        {icon}
-      </motion.span>
-      <motion.span
-        initial={{ letterSpacing: '0.2em' }}
-        whileInView={{ letterSpacing: '0em' }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.8, delay: delay + 0.2, ease: EASE }}
-        className="relative font-serif text-3xl text-white sm:text-4xl"
-      >
-        {count.toLocaleString()}
-        {suffix}
-      </motion.span>
-      <span className="relative text-[10px] font-semibold uppercase tracking-[0.2em] text-white/85">
-        {label}
-      </span>
-      <motion.span
-        aria-hidden
-        className="absolute inset-x-4 bottom-2 h-px origin-left bg-white/40"
-        initial={{ scaleX: 0 }}
-        whileInView={{ scaleX: 1 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.9, delay: delay + 0.3, ease: EASE }}
-      />
-    </motion.div>
-  );
-}
-
-/* ═══════════════ Stats Section ═══════════════ */
-function StatsSection() {
-  const stats = [
-    {
-      value: 200,
-      suffix: '+',
-      label: 'Happy Athletes',
-      icon: (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="h-5 w-5">
-          <circle cx="12" cy="8" r="5" />
-          <path d="m8.5 12.5-1.5 7 5-2.5 5 2.5-1.5-7" />
-        </svg>
-      ),
-    },
-    {
-      value: 350,
-      suffix: '+',
-      label: 'Orders Delivered',
-      icon: (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="h-5 w-5">
-          <path d="M21 8 12 3 3 8v8l9 5 9-5V8Z" />
-          <path d="M3 8l9 5 9-5M12 13v8" />
-        </svg>
-      ),
-    },
-    {
-      value: 30,
-      suffix: '+',
-      label: 'Cities Covered',
-      icon: (
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="h-5 w-5">
-          <path d="M12 22s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12Z" />
-          <circle cx="12" cy="10" r="2.5" />
-        </svg>
-      ),
-    },
-    {
-      value: 95,
-      suffix: '%',
-      label: 'Satisfaction Rate',
-      icon: (
-        <svg viewBox="0 0 20 20" fill="currentColor" className="h-5 w-5">
-          <path d="M10 1.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L10 14.9 4.8 17.6l1-5.8L1.5 7.7l5.9-.9L10 1.5z" />
-        </svg>
-      ),
-    },
+  const trust = [
+    { icon: 'truck', text: 'Free delivery over Rs. 5,000' },
+    { icon: 'cash', text: 'Cash on Delivery' },
+    { icon: 'tag', text: '₨ 200 off on bank transfer' },
   ];
+
   return (
-    <section className="bg-cream py-10 lg:py-12">
+    <section ref={ref} className="relative overflow-hidden bg-charcoal">
       <motion.div
-        variants={staggerContainer}
-        initial="hidden"
-        whileInView="show"
-        viewport={{ once: true, amount: 0.2 }}
-        className="mx-auto grid max-w-7xl grid-cols-2 gap-4 px-4 sm:px-6 lg:grid-cols-4 lg:gap-6"
-      >
-        {stats.map((s, i) => (
-          <StatCounter
-            key={s.label}
-            icon={s.icon}
-            value={s.value}
-            suffix={s.suffix}
-            label={s.label}
-            delay={i * 0.1}
-          />
-        ))}
-      </motion.div>
+        aria-hidden
+        style={{ y: glowY }}
+        className="pointer-events-none absolute -left-24 top-0 h-72 w-72 rounded-full bg-gold-500/20 blur-3xl"
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 opacity-[0.07] [background-image:radial-gradient(#fff_1px,transparent_1px)] [background-size:22px_22px]"
+      />
+
+      <div className="relative mx-auto grid max-w-7xl items-center gap-4 px-4 pb-4 pt-6 sm:px-6 lg:grid-cols-[1.1fr_0.9fr] lg:pt-8">
+        <div className="text-center lg:text-left">
+          <Badge dark>Making dough easier since {FOUNDED}</Badge>
+          <h1 className="mt-2 font-serif text-4xl leading-[1.05] text-cream sm:text-5xl lg:text-6xl">
+            <span className="block">
+              <WordReveal text="Pakistan's original" />
+            </span>
+            <span className="block text-gold-300">
+              <WordReveal text="dough maker." delay={0.25} />
+            </span>
+          </h1>
+          <motion.p
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: EASE, delay: 0.5 }}
+            className="mx-auto mt-2 max-w-xl text-sm text-stone-300 sm:text-base lg:mx-0"
+          >
+            Roti, naan, pizza or pastry. Atta, maida or qeema. Add flour and water, close the lid, and get evenly
+            kneaded dough in five minutes.
+          </motion.p>
+
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: EASE, delay: 0.65 }}
+            className="mt-4 flex flex-wrap items-center justify-center gap-3 lg:justify-start"
+          >
+            <Magnetic>
+              <Link to={firstCategoryLink}>
+                <Button variant="gold" size="lg">
+                  Shop dough makers
+                </Button>
+              </Link>
+            </Magnetic>
+            <a
+              href="#how-it-works"
+              className={`inline-flex items-center gap-2 rounded-full border border-white/20 px-5 py-2.5 text-sm font-medium text-cream transition-colors hover:bg-white/10 ${FOCUS}`}
+            >
+              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-gold-500 text-white">
+                <Icon name="play" className="h-3 w-3" />
+              </span>
+              See how it works
+            </a>
+          </motion.div>
+
+          <motion.ul
+            variants={STAGGER}
+            initial="hidden"
+            animate="show"
+            transition={{ delayChildren: 0.85 }}
+            className="mt-4 flex flex-wrap justify-center gap-x-4 gap-y-1.5 text-xs text-stone-300 lg:justify-start"
+          >
+            {trust.map((t) => (
+              <motion.li key={t.text} variants={ITEM} className="flex items-center gap-1.5">
+                <Icon name={t.icon} className="h-4 w-4 text-gold-300" />
+                {t.text}
+              </motion.li>
+            ))}
+          </motion.ul>
+        </div>
+
+        <HeroVisual />
+      </div>
+
+      {slides.length > 0 && (
+        <div className="relative mx-auto max-w-7xl px-4 pb-4 sm:px-6">
+          <Reveal variant="scale" className="group relative overflow-hidden rounded-2xl ring-1 ring-white/10">
+            <div className="relative aspect-[4/3] w-full bg-charcoal sm:aspect-[16/7] lg:aspect-[16/5]">
+              {slides.map((s, i) => (
+                <motion.img
+                  key={s.id ?? i}
+                  src={assetUrl(s.image_path)}
+                  alt=""
+                  className="absolute inset-0 h-full w-full object-cover object-right lg:object-center"
+                  animate={{ opacity: i === active ? 1 : 0, scale: i === active ? 1 : 1.06 }}
+                  transition={{ duration: 0.9, ease: EASE }}
+                />
+              ))}
+              <Link to={bannerLink} aria-label="View offer" className="absolute inset-0 z-10" />
+
+              {slides.length > 1 && (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => go(active - 1)}
+                    aria-label="Previous slide"
+                    className={`absolute left-3 top-1/2 z-20 hidden h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-charcoal/60 text-cream opacity-0 backdrop-blur transition group-hover:opacity-100 hover:bg-gold-500 sm:flex ${FOCUS}`}
+                  >
+                    <Icon name="left" className="h-4 w-4" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => go(active + 1)}
+                    aria-label="Next slide"
+                    className={`absolute right-3 top-1/2 z-20 hidden h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-charcoal/60 text-cream opacity-0 backdrop-blur transition group-hover:opacity-100 hover:bg-gold-500 sm:flex ${FOCUS}`}
+                  >
+                    <Icon name="right" className="h-4 w-4" />
+                  </button>
+                  <div className="absolute bottom-3 left-3 right-3 z-20 flex justify-center gap-1.5">
+                    {slides.map((_, i) => (
+                      <button
+                        key={i}
+                        type="button"
+                        onClick={() => setActive(i)}
+                        aria-label={`Go to slide ${i + 1}`}
+                        className={`h-1 w-full max-w-14 overflow-hidden rounded-full bg-white/30 ${FOCUS}`}
+                      >
+                        {i < active && <span className="block h-full w-full bg-gold-400" />}
+                        {i === active && (
+                          <motion.span
+                            key={active}
+                            initial={{ scaleX: 0 }}
+                            animate={{ scaleX: 1 }}
+                            transition={{ duration: SLIDE_INTERVAL_MS / 1000, ease: 'linear' }}
+                            className="block h-full w-full origin-left bg-gold-400"
+                          />
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
+          </Reveal>
+        </div>
+      )}
     </section>
   );
 }
 
-/* ═══════════════ Why Athletes Choose Us ═══════════════ */
-const PILLARS = [
-  {
-    key: 'materials',
-    eyebrow: 'Built to Perform',
-    title: 'Competition-Grade Materials',
-    desc: 'Full-grain leather, solid brass, and reinforced webbing — sourced for durability under real load, so your gear holds up as long as you do.',
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="h-6 w-6">
-        <path d="M12 3l7 3v6c0 4.5-3 8-7 9-4-1-7-4.5-7-9V6l7-3z" />
-        <path d="m9 12 2 2 4-4" />
-      </svg>
-    ),
-  },
-  {
-    key: 'construction',
-    eyebrow: 'Made to Last',
-    title: 'Reinforced Stitching & Hardware',
-    desc: 'Double-stitched seams and heavy-duty buckles, tested to handle max effort — built for the gym floor, the ring, and everywhere in between.',
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="h-6 w-6">
-        <rect x="3" y="8" width="8" height="8" rx="3" />
-        <rect x="13" y="8" width="8" height="8" rx="3" />
-      </svg>
-    ),
-  },
-  {
-    key: 'delivery',
-    eyebrow: 'Nationwide',
-    title: 'Fast, Reliable Delivery',
-    desc: 'Cash on Delivery, tracked every step of the way, so your gear arrives fast, safe, and ready for training day one.',
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="h-6 w-6">
-        <path d="M2 6h11v11H2zM13 10h4l4 4v3h-8z" />
-        <circle cx="6.5" cy="19" r="1.8" />
-        <circle cx="16.5" cy="19" r="1.8" />
-      </svg>
-    ),
-  },
-  {
-    key: 'returns',
-    eyebrow: 'Risk-Free',
-    title: 'Hassle-Free Returns',
-    desc: "Not the right fit or finish? Easy returns and quick exchanges — no runaround, no hidden fees, no questions asked.",
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="h-6 w-6">
-        <path d="M3 12a9 9 0 1 0 3-6.7" />
-        <path d="M3 4v4h4" />
-      </svg>
-    ),
-  },
-];
-
-function WhyChooseUs() {
+/* ═══════════════ Categories ═══════════════ */
+function Categories({ categories }) {
+  if (!categories.length) return null;
   return (
-    <section className="bg-cream py-12">
-      <div className="mx-auto max-w-2xl px-4 sm:px-6">
-        <SectionHeading
-          eyebrow="Why MA Universal"
-          title="Why Athletes Choose Us"
-          subtitle="Four reasons lifters, competitors, and riders trust us with their gear."
-        />
+    <section className="bg-white py-8">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6">
+        <SectionHeading title="Shop by category" subtitle="Machines and accessories, ready to ship across Pakistan." />
+        <div className={`grid gap-3 ${categories.length >= 3 ? 'sm:grid-cols-3' : 'sm:grid-cols-2'}`}>
+          {categories.map((cat, i) => (
+            <Reveal key={cat.slug} variant="scale" delay={i * 0.08}>
+              <TiltCard>
+                <Link
+                  to={`/category/${cat.slug}`}
+                  className={`group relative block aspect-[16/10] overflow-hidden rounded-2xl bg-charcoal ${FOCUS}`}
+                >
+                  {cat.banner_image ? (
+                    <img
+                      src={assetUrl(cat.banner_image)}
+                      alt=""
+                      className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
+                    />
+                  ) : (
+                    <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-gold-400 to-gold-600 font-serif text-7xl text-white/80">
+                      {cat.name[0]}
+                    </div>
+                  )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-charcoal/80 via-charcoal/10 to-transparent" />
+                  <div className="absolute inset-x-0 bottom-0 flex items-end justify-between p-4">
+                    <h3 className="font-serif text-xl text-cream sm:text-2xl">{cat.name}</h3>
+                    <span className="flex h-9 w-9 items-center justify-center rounded-full bg-cream text-charcoal transition duration-300 group-hover:-rotate-45 group-hover:bg-gold-500 group-hover:text-white">
+                      <Icon name="arrow" className="h-4 w-4" />
+                    </span>
+                  </div>
+                </Link>
+              </TiltCard>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
 
-        <div className="relative">
+/* ═══════════════ Products (Featured / New arrivals tabs) ═══════════════ */
+function ProductsShowcase({ featured, featuredLoading, newArrivals, newArrivalsLoading, viewAllLink }) {
+  const [tab, setTab] = useState('featured');
+  const tabs = [
+    { key: 'featured', label: 'Featured' },
+    { key: 'new', label: 'New arrivals' },
+  ];
+  const items = tab === 'featured' ? featured : newArrivals;
+  const loading = tab === 'featured' ? featuredLoading : newArrivalsLoading;
+  const skeletons = tab === 'featured' ? 12 : 8;
+  const grid = 'grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4';
+
+  return (
+    <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
+      <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
+        <SectionHeading title="Find your kneader" />
+        <div role="tablist" className="mb-4 flex rounded-full bg-white p-1 shadow-sm ring-1 ring-gold-500/15">
+          {tabs.map((t) => (
+            <button
+              key={t.key}
+              type="button"
+              role="tab"
+              aria-selected={tab === t.key}
+              onClick={() => setTab(t.key)}
+              className={`relative z-10 rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${FOCUS} ${
+                tab === t.key ? 'text-white' : 'text-charcoal-light hover:text-charcoal'
+              }`}
+            >
+              {tab === t.key && (
+                <motion.span
+                  layoutId="products-tab"
+                  transition={SPRING}
+                  className="absolute inset-0 -z-10 rounded-full bg-gold-500"
+                />
+              )}
+              {t.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={tab}
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -8 }}
+          transition={{ duration: 0.3, ease: EASE }}
+        >
+          {loading ? (
+            <div className={grid}>
+              {Array.from({ length: skeletons }).map((_, i) => (
+                <ProductCardSkeleton key={i} />
+              ))}
+            </div>
+          ) : items?.length ? (
+            <motion.div variants={STAGGER} initial="hidden" animate="show" className={grid}>
+              {items.map((product) => (
+                <motion.div key={product.id} variants={ITEM} whileHover={{ y: -6, transition: SPRING }}>
+                  <ProductCard product={product} />
+                </motion.div>
+              ))}
+            </motion.div>
+          ) : (
+            <p className="py-8 text-center text-charcoal-light">Products coming soon.</p>
+          )}
+        </motion.div>
+      </AnimatePresence>
+
+      <Reveal className="mt-5 text-center">
+        <Link to={viewAllLink}>
+          <Button variant="outline" size="lg">
+            View all products
+          </Button>
+        </Link>
+      </Reveal>
+    </section>
+  );
+}
+
+/* ═══════════════ How it works ═══════════════ */
+function VideoFacade({ id }) {
+  const [play, setPlay] = useState(false);
+  return (
+    <div className="relative aspect-video overflow-hidden rounded-2xl bg-charcoal shadow-lg ring-1 ring-gold-500/20">
+      {play ? (
+        <iframe
+          src={`https://www.youtube.com/embed/${id}?autoplay=1&rel=0`}
+          title="How the Abdullah dough maker works"
+          allow="autoplay; encrypted-media; picture-in-picture"
+          allowFullScreen
+          className="absolute inset-0 h-full w-full"
+        />
+      ) : (
+        <button
+          type="button"
+          onClick={() => setPlay(true)}
+          aria-label="Play video: how the dough maker works"
+          className={`group absolute inset-0 ${FOCUS}`}
+        >
+          <img
+            src={`https://i.ytimg.com/vi/${id}/hqdefault.jpg`}
+            alt=""
+            loading="lazy"
+            className="h-full w-full object-cover opacity-80 transition duration-500 group-hover:scale-105 group-hover:opacity-100"
+          />
+          <span className="absolute inset-0 bg-charcoal/30" />
+          <span className="absolute inset-0 flex items-center justify-center">
+            <motion.span
+              className="absolute h-16 w-16 rounded-full bg-gold-500/40"
+              animate={{ scale: [1, 1.7], opacity: [0.7, 0] }}
+              transition={{ duration: 1.8, repeat: Infinity, ease: 'easeOut' }}
+            />
+            <span className="relative flex h-14 w-14 items-center justify-center rounded-full bg-gold-500 text-white shadow-lg transition group-hover:scale-110">
+              <Icon name="play" className="ml-0.5 h-5 w-5" />
+            </span>
+          </span>
+        </button>
+      )}
+    </div>
+  );
+}
+
+function TimerRing() {
+  const ref = useRef(null);
+  const inView = useInView(ref, { amount: 0.6 });
+  const [p, setP] = useState(0);
+
+  useEffect(() => {
+    if (!inView) return;
+    const controls = animate(0, 1, {
+      duration: 6,
+      ease: 'linear',
+      repeat: Infinity,
+      repeatDelay: 1.2,
+      onUpdate: setP,
+    });
+    return () => controls.stop();
+  }, [inView]);
+
+  const R = 34;
+  const C = 2 * Math.PI * R;
+  const left = Math.ceil((1 - p) * 300);
+  const done = p >= 0.995;
+
+  return (
+    <div ref={ref} className="mt-2 flex items-center gap-3">
+      <svg viewBox="0 0 80 80" className="h-16 w-16 -rotate-90" aria-hidden>
+        <circle cx="40" cy="40" r={R} fill="none" strokeWidth="6" className="stroke-gold-500/15" />
+        <circle
+          cx="40"
+          cy="40"
+          r={R}
+          fill="none"
+          strokeWidth="6"
+          strokeLinecap="round"
+          className="stroke-gold-500"
+          strokeDasharray={C}
+          strokeDashoffset={C * (1 - p)}
+        />
+      </svg>
+      <div>
+        <p className="font-serif text-xl tabular-nums text-charcoal">
+          {done ? 'Ready' : `${Math.floor(left / 60)}:${String(left % 60).padStart(2, '0')}`}
+        </p>
+        <p className="text-xs text-charcoal-light">A preview of the five-minute cycle</p>
+      </div>
+    </div>
+  );
+}
+
+function ProcessStep({ step, i, progress }) {
+  const start = i / STEPS.length;
+  const lit = useTransform(progress, [start - 0.05, start + 0.1], [0, 1]);
+  const cardOpacity = useTransform(progress, [start - 0.2, start], [0.45, 1]);
+  return (
+    <div className="relative">
+      <div className="absolute -left-12 top-0">
+        <span className="relative flex h-9 w-9 items-center justify-center rounded-full border-2 border-gold-500/30 bg-white text-gold-600">
+          <motion.span style={{ opacity: lit }} className="absolute inset-0 rounded-full bg-gold-500" />
+          <Icon name={step.icon} className="h-4 w-4" />
+          <motion.span
+            style={{ opacity: lit }}
+            className="absolute inset-0 flex items-center justify-center text-white"
+          >
+            <Icon name={step.icon} className="h-4 w-4" />
+          </motion.span>
+        </span>
+      </div>
+      <motion.div style={{ opacity: cardOpacity }} className="rounded-2xl border border-gold-500/15 bg-cream p-3.5">
+        <span className="text-xs font-medium text-gold-600">Step {i + 1}</span>
+        <h3 className="mt-0.5 font-serif text-base text-charcoal">{step.title}</h3>
+        <p className="mt-1 text-sm text-charcoal-light">{step.text}</p>
+        {i === STEPS.length - 1 && <TimerRing />}
+      </motion.div>
+    </div>
+  );
+}
+
+function Process() {
+  const ref = useRef(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ['start 75%', 'end 65%'] });
+  const progress = useSpring(scrollYProgress, { stiffness: 120, damping: 30 });
+  return (
+    <section id="how-it-works" className="bg-white py-8">
+      <div className="mx-auto grid max-w-7xl gap-5 px-4 sm:px-6 lg:grid-cols-2 lg:gap-8">
+        <div className="lg:sticky lg:top-20 lg:self-start">
+          <SectionHeading
+            badge="How it works"
+            title="Three steps to fresh dough"
+            subtitle="No flour clouds, no tired arms. Watch the machine work, or follow the steps."
+          />
+          <Reveal variant="scale">
+            <VideoFacade id={VIDEO_ID} />
+          </Reveal>
+        </div>
+
+        <div ref={ref} className="relative pl-12">
+          <div className="absolute bottom-2 left-[18px] top-2 w-0.5 rounded bg-gold-500/15" />
           <motion.div
+            style={{ scaleY: progress }}
+            className="absolute bottom-2 left-[18px] top-2 w-0.5 origin-top rounded bg-gold-500"
+          />
+          <div className="flex flex-col gap-3">
+            {STEPS.map((s, i) => (
+              <ProcessStep key={s.title} step={s} i={i} progress={progress} />
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ═══════════════ What can it knead ═══════════════ */
+function Kneading({ link }) {
+  const [active, setActive] = useState('atta');
+  const item = KNEAD.find((k) => k.key === active);
+  return (
+    <section className="bg-cream py-8">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6">
+        <SectionHeading
+          title="Atta, maida or qeema"
+          subtitle="One machine handles the doughs and mixtures your kitchen makes every week."
+        />
+        <div role="tablist" className="mb-3 inline-flex rounded-full bg-white p-1 shadow-sm ring-1 ring-gold-500/15">
+          {KNEAD.map((k) => (
+            <button
+              key={k.key}
+              type="button"
+              role="tab"
+              aria-selected={active === k.key}
+              onClick={() => setActive(k.key)}
+              className={`relative z-10 rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${FOCUS} ${
+                active === k.key ? 'text-white' : 'text-charcoal-light hover:text-charcoal'
+              }`}
+            >
+              {active === k.key && (
+                <motion.span
+                  layoutId="knead-tab"
+                  transition={SPRING}
+                  className="absolute inset-0 -z-10 rounded-full bg-gold-500"
+                />
+              )}
+              {k.label}
+            </button>
+          ))}
+        </div>
+
+        <div className="grid items-center gap-5 overflow-hidden rounded-3xl bg-white p-4 shadow-sm ring-1 ring-gold-500/10 md:grid-cols-2 md:p-6">
+          <div className="relative mx-auto aspect-square w-full max-w-[240px]">
+            <motion.div
+              className="absolute inset-[12%] overflow-hidden shadow-inner"
+              animate={{
+                backgroundColor: item.image ? 'transparent' : item.color,
+                borderRadius: [
+                  '60% 40% 55% 45% / 50% 60% 40% 50%',
+                  '45% 55% 40% 60% / 60% 45% 55% 40%',
+                  '60% 40% 55% 45% / 50% 60% 40% 50%',
+                ],
+              }}
+              transition={{
+                backgroundColor: { duration: 0.6 },
+                borderRadius: { duration: 6, ease: 'easeInOut', repeat: Infinity },
+              }}
+            >
+              <AnimatePresence mode="wait">
+                {item.image && (
+                  <motion.img
+                    key={item.image}
+                    src={item.image}
+                    alt={item.label}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.5, ease: EASE }}
+                    className="h-full w-full object-cover"
+                  />
+                )}
+              </AnimatePresence>
+            </motion.div>
+            <div className="absolute left-[26%] top-[24%] h-[16%] w-[28%] rounded-full bg-white/40 blur-md" />
+            <AnimatePresence>
+              {item.uses.map((u, i) => (
+                <motion.span
+                  key={`${item.key}-${u}`}
+                  initial={{ opacity: 0, scale: 0.7 }}
+                  animate={{ opacity: 1, scale: 1, y: [0, -6, 0] }}
+                  exit={{ opacity: 0, scale: 0.7 }}
+                  transition={{
+                    opacity: { delay: i * 0.08 },
+                    scale: { ...SPRING, delay: i * 0.08 },
+                    y: { duration: 3.5, repeat: Infinity, ease: 'easeInOut', delay: i * 0.4 },
+                  }}
+                  className={`absolute rounded-full border border-gold-500/25 bg-white px-3 py-1 text-xs font-medium text-charcoal shadow-sm ${CHIP_SLOTS[i]}`}
+                >
+                  {u}
+                </motion.span>
+              ))}
+            </AnimatePresence>
+          </div>
+
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={item.key}
+              initial={{ opacity: 0, x: 24 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -24 }}
+              transition={{ duration: 0.35, ease: EASE }}
+            >
+              <h3 className="font-serif text-xl text-charcoal sm:text-2xl">{item.title}</h3>
+              <p className="mt-1.5 max-w-md text-sm text-charcoal-light">{item.text}</p>
+              <Link to={link} className="mt-3 inline-block">
+                <Button variant="gold" size="lg">
+                  Shop kneaders
+                </Button>
+              </Link>
+            </motion.div>
+          </AnimatePresence>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ═══════════════ Stats ═══════════════ */
+function StatCounter({ value, suffix = '', label }) {
+  const ref = useRef(null);
+  const inView = useInView(ref, { once: true, amount: 0.5 });
+  const [n, setN] = useState(0);
+
+  useEffect(() => {
+    if (!inView) return;
+    const controls = animate(0, value, { duration: 1.8, ease: EASE, onUpdate: (v) => setN(Math.round(v)) });
+    return () => controls.stop();
+  }, [inView, value]);
+
+  return (
+    <div ref={ref} className="px-3 py-3 text-center lg:border-l lg:border-white/10 lg:first:border-l-0">
+      <p className="font-serif text-3xl tabular-nums text-cream sm:text-4xl">
+        {n.toLocaleString()}
+        <span className="text-gold-400">{suffix}</span>
+      </p>
+      <p className="mt-0.5 text-xs text-stone-400 sm:text-sm">{label}</p>
+    </div>
+  );
+}
+
+function StatsSection() {
+  const stats = [
+    { value: 15000, suffix: '+', label: 'Happy kitchens' },
+    { value: YEARS, suffix: '+', label: 'Years of trust' },
+    { value: 50, suffix: '+', label: 'Cities covered' },
+    { value: 98, suffix: '%', label: 'Satisfaction rate' },
+  ];
+  return (
+    <section className="relative overflow-hidden bg-charcoal py-6">
+      <motion.div
+        aria-hidden
+        className="pointer-events-none absolute left-1/4 top-0 h-40 w-72 rounded-full bg-gold-500/15 blur-3xl"
+        animate={{ x: [-40, 40, -40] }}
+        transition={{ duration: 12, ease: 'easeInOut', repeat: Infinity }}
+      />
+      <div className="relative mx-auto grid max-w-7xl grid-cols-2 gap-y-1 px-4 sm:px-6 lg:grid-cols-4">
+        {stats.map((s) => (
+          <StatCounter key={s.label} {...s} />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+/* ═══════════════ Why choose us (bento) ═══════════════ */
+function Tile({ className = '', delay = 0, children }) {
+  return (
+    <motion.div
+      variants={REVEAL.up}
+      initial="hidden"
+      whileInView="show"
+      viewport={{ once: true, amount: 0.2 }}
+      transition={{ duration: 0.55, ease: EASE, delay }}
+      whileHover={{ y: -4 }}
+      className={`relative overflow-hidden rounded-2xl p-4 ${className}`}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+function Why() {
+  return (
+    <section className="bg-cream py-8">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6">
+        <SectionHeading
+          title="Built to make dough effortless"
+          subtitle="Precise mixing, dependable performance, and a design anyone in the family can use."
+        />
+        <div className="grid gap-3 md:grid-cols-6">
+          <Tile className="bg-charcoal text-cream md:col-span-4">
+            <div className="relative z-10 max-w-sm pr-0 sm:pr-24">
+              <h3 className="font-serif text-lg sm:text-xl">Precision mixing</h3>
+              <p className="mt-1 text-sm text-stone-300">
+                The kneading action works flour and water evenly through the whole batch, so every roti is as soft as
+                the first.
+              </p>
+            </div>
+            <div aria-hidden className="absolute -right-6 top-1/2 h-36 w-36 -translate-y-1/2 sm:right-4">
+              {[0, 1, 2].map((i) => (
+                <motion.span
+                  key={i}
+                  className="absolute rounded-full border-2 border-transparent border-t-gold-400"
+                  style={{ inset: i * 16 }}
+                  animate={{ rotate: i % 2 ? -360 : 360 }}
+                  transition={{ duration: 6 + i * 3, ease: 'linear', repeat: Infinity }}
+                />
+              ))}
+              <span className="absolute inset-[48px] rounded-full bg-gold-500/30" />
+            </div>
+          </Tile>
+
+          <Tile delay={0.08} className="bg-gradient-to-br from-gold-400 to-gold-600 text-white md:col-span-2">
+            <motion.span
+              aria-hidden
+              className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-white/20"
+              animate={{ scale: [1, 1.2, 1] }}
+              transition={{ duration: 3.5, ease: 'easeInOut', repeat: Infinity }}
+            />
+            <p className="relative font-serif text-5xl leading-none">5</p>
+            <p className="relative mt-0.5 font-serif text-base">minutes to smooth dough</p>
+            <p className="relative mt-0.5 text-xs text-white/85">Efficient, reliable performance every day.</p>
+          </Tile>
+
+          <Tile delay={0.05} className="bg-white ring-1 ring-gold-500/10 md:col-span-2">
+            <h3 className="font-serif text-base text-charcoal">One machine, every dough</h3>
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {['Atta', 'Maida', 'Qeema', 'Naan', 'Pizza', 'Pastry'].map((c, i) => (
+                <motion.span
+                  key={c}
+                  className="rounded-full bg-gold-500/10 px-2.5 py-0.5 text-xs font-medium text-gold-600"
+                  animate={{ y: [0, -4, 0] }}
+                  transition={{ duration: 3, ease: 'easeInOut', repeat: Infinity, delay: i * 0.25 }}
+                >
+                  {c}
+                </motion.span>
+              ))}
+            </div>
+          </Tile>
+
+          <Tile delay={0.1} className="bg-white ring-1 ring-gold-500/10 md:col-span-2">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <h3 className="font-serif text-base text-charcoal">Less mess</h3>
+                <p className="mt-0.5 text-xs text-charcoal-light">A closed lid keeps flour in and the counter clean.</p>
+              </div>
+              <div aria-hidden className="relative mt-1 h-10 w-10 shrink-0">
+                <motion.span
+                  className="absolute inset-x-0 top-0 h-2.5 rounded-md bg-gold-500"
+                  animate={{ y: [-8, 0, 0, -8] }}
+                  transition={{ duration: 3, ease: 'easeInOut', repeat: Infinity, times: [0, 0.3, 0.7, 1] }}
+                />
+                <span className="absolute inset-x-1 bottom-0 top-3 rounded-b-xl border-2 border-gold-500/40" />
+              </div>
+            </div>
+          </Tile>
+
+          <Tile delay={0.15} className="bg-white ring-1 ring-gold-500/10 md:col-span-2">
+            <h3 className="font-serif text-base text-charcoal">Made for the whole family</h3>
+            <p className="mt-0.5 text-xs text-charcoal-light">Easy enough for everyone to join in and try new recipes.</p>
+            <div className="mt-2 flex -space-x-2">
+              {['A', 'S', 'U', 'F'].map((l, i) => (
+                <motion.span
+                  key={l}
+                  initial={{ scale: 0 }}
+                  whileInView={{ scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ ...SPRING, delay: 0.3 + i * 0.1 }}
+                  className="flex h-7 w-7 items-center justify-center rounded-full border-2 border-white bg-gold-500/15 font-serif text-xs text-gold-600"
+                >
+                  {l}
+                </motion.span>
+              ))}
+            </div>
+          </Tile>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ═══════════════ Capacity picker ═══════════════ */
+function Capacity({ link }) {
+  const [size, setSize] = useState(SIZES[0].key);
+  const s = SIZES.find((x) => x.key === size);
+  return (
+    <section className="bg-white py-8">
+      <div className="mx-auto grid max-w-7xl items-center gap-5 px-4 sm:px-6 md:grid-cols-2">
+        <div>
+          <SectionHeading title="Pick the size for your kitchen" subtitle="Two capacities, the same easy three-step routine." />
+          <div role="tablist" className="inline-flex rounded-full bg-cream p-1 ring-1 ring-gold-500/15">
+            {SIZES.map((x) => (
+              <button
+                key={x.key}
+                type="button"
+                role="tab"
+                aria-selected={size === x.key}
+                onClick={() => setSize(x.key)}
+                className={`relative z-10 rounded-full px-5 py-1.5 text-sm font-medium transition-colors ${FOCUS} ${
+                  size === x.key ? 'text-white' : 'text-charcoal-light hover:text-charcoal'
+                }`}
+              >
+                {size === x.key && (
+                  <motion.span
+                    layoutId="size-tab"
+                    transition={SPRING}
+                    className="absolute inset-0 -z-10 rounded-full bg-gold-500"
+                  />
+                )}
+                {x.label}
+              </button>
+            ))}
+          </div>
+
+          <div className="mt-3 min-h-[72px]">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={s.key}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.3, ease: EASE }}
+              >
+                <p className="max-w-sm text-sm text-charcoal-light">{s.text}</p>
+                <div className="mt-2 flex flex-wrap gap-1.5">
+                  {s.models.map((m) => (
+                    <span key={m} className="rounded-full bg-gold-500/10 px-2.5 py-0.5 text-xs font-medium text-gold-600">
+                      {m}
+                    </span>
+                  ))}
+                </div>
+              </motion.div>
+            </AnimatePresence>
+          </div>
+
+          <Link to={link} className="mt-3 inline-block">
+            <Button variant="gold" size="lg">
+              See {s.label} models
+            </Button>
+          </Link>
+        </div>
+
+        <div className="mx-auto flex w-full max-w-xs items-end justify-center" aria-hidden>
+          <div className="relative h-48 w-48 overflow-hidden rounded-b-[999px] rounded-t-3xl border-2 border-gold-500/30 bg-cream">
+            <motion.div
+              className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-gold-300 to-gold-200"
+              animate={{ height: `${s.fill * 100}%` }}
+              transition={SPRING}
+            />
+            <AnimatePresence mode="popLayout">
+              <motion.span
+                key={s.key}
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -12 }}
+                transition={{ duration: 0.3 }}
+                className="absolute inset-0 flex items-center justify-center font-serif text-3xl text-charcoal"
+              >
+                {s.label}
+              </motion.span>
+            </AnimatePresence>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ═══════════════ Story ═══════════════ */
+function Story() {
+  const ref = useRef(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] });
+  const yBig = useTransform(scrollYProgress, [0, 1], [70, -70]);
+  return (
+    <section ref={ref} className="relative overflow-hidden bg-charcoal py-10">
+      <motion.p
+        aria-hidden
+        style={{ y: yBig }}
+        className="pointer-events-none absolute -right-4 top-2 select-none font-serif text-[9rem] leading-none text-transparent [-webkit-text-stroke:1px_rgba(255,255,255,0.12)] sm:text-[16rem]"
+      >
+        {FOUNDED}
+      </motion.p>
+
+      <div className="relative mx-auto grid max-w-7xl gap-6 px-4 sm:px-6 lg:grid-cols-2 lg:items-center">
+        <div>
+          <Badge dark>Our story</Badge>
+          <WordReveal
+            as="h2"
+            text="The dough maker that started it all"
+            className="mt-2 block font-serif text-2xl leading-tight text-cream sm:text-3xl"
+          />
+          <Reveal delay={0.15}>
+            <p className="mt-2 max-w-lg text-sm text-stone-300 sm:text-base">
+              Dough maker innovation in Pakistan started with Abdullah Kneaders in {FOUNDED}. From the beginning,
+              our mission has been to design efficient, reliable and easy-to-use dough makers that simplify daily
+              cooking for every home.
+            </p>
+            <Link
+              to={LINKS.about}
+              className={`mt-3 inline-flex items-center gap-2 rounded-full border border-white/20 px-5 py-2.5 text-sm font-medium text-cream transition-colors hover:bg-white/10 ${FOCUS}`}
+            >
+              Read our story
+              <Icon name="arrow" className="h-4 w-4" />
+            </Link>
+          </Reveal>
+        </div>
+
+        <div className="relative pl-10">
+          <motion.div
+            aria-hidden
             initial={{ scaleY: 0 }}
             whileInView={{ scaleY: 1 }}
-            viewport={{ once: true, amount: 0.1 }}
-            transition={{ duration: 1.1, ease: EASE }}
-            className="absolute left-6 top-6 bottom-6 w-px origin-top bg-gold-500/20"
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ duration: 1.2, ease: EASE }}
+            className="absolute bottom-3 left-3 top-3 w-px origin-top bg-gold-500/40"
           />
-
-          <div className="flex flex-col gap-5">
-            {PILLARS.map((item, i) => (
+          <div className="flex flex-col gap-4">
+            {MILESTONES.map((m, i) => (
               <motion.div
-                key={item.key}
-                initial={{ opacity: 0, x: -20 }}
+                key={m.title}
+                initial={{ opacity: 0, x: 24 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true, amount: 0.5 }}
-                transition={{ duration: 0.5, delay: i * 0.1, ease: EASE }}
-                className="group relative flex items-start gap-4"
+                transition={{ duration: 0.55, ease: EASE, delay: i * 0.1 }}
+                className="relative"
               >
-                <motion.div
-                  initial={{ scale: 0, rotate: -90 }}
-                  whileInView={{ scale: 1, rotate: 0 }}
-                  viewport={{ once: true, amount: 0.5 }}
-                  transition={{ ...SPRING, delay: i * 0.1 + 0.1 }}
-                  whileHover={{ scale: 1.08, transition: SPRING }}
-                  className="relative z-10 flex h-12 w-12 shrink-0 items-center justify-center rounded-full border-2 border-gold-500/30 bg-white text-gold-600 shadow-sm transition-colors duration-300 group-hover:border-gold-500 group-hover:bg-gold-500 group-hover:text-white"
-                >
-                  {item.icon}
-                </motion.div>
-
-                <motion.div
-                  whileHover={{ x: 4, transition: SPRING_SOFT }}
-                  className="flex-1 rounded-lg border border-gold-500/15 bg-white px-4 py-3 shadow-sm transition-all duration-300 group-hover:border-gold-500/50 group-hover:shadow-md"
-                >
-                  <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-gold-600">
-                    {item.eyebrow}
-                  </span>
-                  <h3 className="mt-0.5 font-serif text-base leading-snug text-charcoal">
-                    {item.title}
-                  </h3>
-                  <p className="mt-1 text-sm leading-snug text-charcoal-light">
-                    {item.desc}
-                  </p>
-                </motion.div>
+                <span className="absolute -left-10 top-0 flex h-7 w-7 items-center justify-center rounded-full bg-gold-500 text-white">
+                  <Icon name={m.icon} className="h-3.5 w-3.5" />
+                </span>
+                <h3 className="font-serif text-base text-cream">{m.title}</h3>
+                <p className="mt-0.5 max-w-md text-xs text-stone-300 sm:text-sm">{m.text}</p>
               </motion.div>
             ))}
           </div>
@@ -387,317 +1390,256 @@ function WhyChooseUs() {
   );
 }
 
-/* ═══════════════ Marquee Item ═══════════════ */
-function MarqueeItem({ text, index }) {
-  return (
-    <motion.span
-      initial={{ opacity: 0, x: -20 }}
-      whileInView={{ opacity: 1, x: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.5, delay: index * 0.06, ease: EASE }}
-      className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-widest text-stone-300"
-    >
-      <motion.span
-        animate={{ scale: [1, 1.4, 1], opacity: [0.7, 1, 0.7] }}
-        transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut', delay: index * 0.3 }}
-        className="h-1 w-1 rounded-full bg-gold-500"
-      />
-      {text}
-    </motion.span>
-  );
-}
-
-/* ═══════════════ Instagram Live Embed ═══════════════ */
-function InstagramEmbed({ url }) {
-  useEffect(() => {
-    function process() {
-      window.instgrm?.Embeds.process();
-    }
-    if (window.instgrm) {
-      process();
-      return;
-    }
-    const existing = document.getElementById('instagram-embed-script');
-    if (existing) {
-      existing.addEventListener('load', process);
-      return () => existing.removeEventListener('load', process);
-    }
-    const script = document.createElement('script');
-    script.id = 'instagram-embed-script';
-    script.src = 'https://www.instagram.com/embed.js';
-    script.async = true;
-    script.onload = process;
-    document.body.appendChild(script);
-  }, [url]);
-
-  return (
-    <blockquote
-      className="instagram-media"
-      data-instgrm-permalink={`${url}?utm_source=ig_embed&utm_campaign=loading`}
-      data-instgrm-version="14"
-      style={{
-        background: '#FFF',
-        border: 0,
-        borderRadius: 3,
-        boxShadow: '0 0 1px 0 rgba(0,0,0,0.5),0 1px 10px 0 rgba(0,0,0,0.15)',
-        margin: '1px auto',
-        maxWidth: 400,
-        minWidth: 326,
-        padding: 0,
-        width: '100%',
-      }}
-    >
-      <div style={{ padding: 16 }}>
-        <a href={url} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
-          View this post on Instagram
-        </a>
-      </div>
-    </blockquote>
-  );
-}
-
-/* ═══════════════ Testimonials Carousel ═══════════════ */
-function TestimonialsSection() {
-  const [index, setIndex] = useState(1);
-  const [dir, setDir] = useState(0);
+/* ═══════════════ Testimonials ═══════════════ */
+function Testimonials() {
+  const [i, setI] = useState(0);
   const [paused, setPaused] = useState(false);
-
-  const go = (nextIndex) => {
-    setDir(nextIndex > index ? 1 : -1);
-    setIndex((nextIndex + TESTIMONIALS.length) % TESTIMONIALS.length);
-  };
-
-  const prev = () => go(index - 1);
-  const next = () => go(index + 1);
 
   useEffect(() => {
     if (paused) return;
-    const t = setInterval(() => {
-      setDir(1);
-      setIndex((i) => (i + 1) % TESTIMONIALS.length);
-    }, 6000);
-    return () => clearInterval(t);
-  }, [paused]);
+    const t = setTimeout(() => setI((n) => (n + 1) % TESTIMONIALS.length), 6500);
+    return () => clearTimeout(t);
+  }, [paused, i]);
 
-  const prevIdx = (index - 1 + TESTIMONIALS.length) % TESTIMONIALS.length;
-  const nextIdx = (index + 1) % TESTIMONIALS.length;
-
+  const t = TESTIMONIALS[i];
   return (
     <section
-      className="relative overflow-hidden bg-cream py-10"
+      className="bg-cream py-8"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
-      <div className="relative mx-auto max-w-7xl px-4 sm:px-6">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, ease: EASE }}
-          className="mb-8 flex flex-col items-center text-center"
-        >
-          <span className="mb-1.5 flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.3em] text-gold-600">
-            <motion.span
-              initial={{ scaleX: 0 }}
-              whileInView={{ scaleX: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.7, ease: EASE, delay: 0.15 }}
-              className="h-px w-8 origin-right bg-gold-500/60"
-            />
-            Loved by Athletes
-            <motion.span
-              initial={{ scaleX: 0 }}
-              whileInView={{ scaleX: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.7, ease: EASE, delay: 0.15 }}
-              className="h-px w-8 origin-left bg-gold-500/60"
-            />
-          </span>
-          <h2 className="font-serif text-2xl uppercase tracking-[0.15em] text-charcoal sm:text-3xl">
-            What Our Clients <span className="text-gold-600">Say</span>
-          </h2>
-        </motion.div>
-
-        <div className="relative flex items-center justify-center">
-          <motion.div
-            initial={{ opacity: 0, x: 20, rotate: 0 }}
-            whileInView={{ opacity: 1, x: 0, rotate: -3 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7, ease: EASE }}
-            animate={{ y: [0, -6, 0] }}
-            className="pointer-events-none absolute left-0 top-1/2 hidden w-[340px] -translate-y-1/2 -translate-x-[38%] scale-[0.85] lg:block"
-          >
-            <div className="relative overflow-hidden rounded-lg border border-gold-500/20 bg-white p-5 opacity-70 shadow-md blur-[1px]">
-              <span className="pointer-events-none absolute left-4 top-4 font-serif text-3xl leading-none text-gold-500/30">
-                &ldquo;
-              </span>
-              <div className="flex justify-end gap-0.5">
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <svg key={i} viewBox="0 0 20 20" className="h-3.5 w-3.5 fill-gold-500/70">
-                    <path d="M10 1.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L10 14.9 4.8 17.6l1-5.8L1.5 7.7l5.9-.9L10 1.5z" />
-                  </svg>
-                ))}
-              </div>
-              <p className="mt-4 text-sm italic leading-relaxed text-charcoal-light line-clamp-3">
-                {TESTIMONIALS[prevIdx].quote}
-              </p>
-              <div className="mt-4 flex items-center gap-2.5 border-t border-stone-200 pt-3">
-                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-gold-500/10 font-serif text-xs text-gold-600">
-                  {TESTIMONIALS[prevIdx].name[0]}
-                </span>
-                <div>
-                  <p className="text-xs font-semibold text-charcoal">{TESTIMONIALS[prevIdx].name}</p>
-                  <p className="text-[10px] uppercase tracking-wider text-gold-600">
-                    {TESTIMONIALS[prevIdx].location}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, x: -20, rotate: 0 }}
-            whileInView={{ opacity: 1, x: 0, rotate: 3 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7, ease: EASE }}
-            animate={{ y: [0, 6, 0] }}
-            className="pointer-events-none absolute right-0 top-1/2 hidden w-[340px] -translate-y-1/2 translate-x-[38%] scale-[0.85] lg:block"
-          >
-            <div className="relative overflow-hidden rounded-lg border border-gold-500/20 bg-white p-5 opacity-70 shadow-md blur-[1px]">
-              <span className="pointer-events-none absolute left-4 top-4 font-serif text-3xl leading-none text-gold-500/30">
-                &ldquo;
-              </span>
-              <div className="flex justify-end gap-0.5">
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <svg key={i} viewBox="0 0 20 20" className="h-3.5 w-3.5 fill-gold-500/70">
-                    <path d="M10 1.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L10 14.9 4.8 17.6l1-5.8L1.5 7.7l5.9-.9L10 1.5z" />
-                  </svg>
-                ))}
-              </div>
-              <p className="mt-4 text-sm italic leading-relaxed text-charcoal-light line-clamp-3">
-                {TESTIMONIALS[nextIdx].quote}
-              </p>
-              <div className="mt-4 flex items-center gap-2.5 border-t border-stone-200 pt-3">
-                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-gold-500/10 font-serif text-xs text-gold-600">
-                  {TESTIMONIALS[nextIdx].name[0]}
-                </span>
-                <div>
-                  <p className="text-xs font-semibold text-charcoal">{TESTIMONIALS[nextIdx].name}</p>
-                  <p className="text-[10px] uppercase tracking-wider text-gold-600">
-                    {TESTIMONIALS[nextIdx].location}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </motion.div>
-
-          <div className="relative w-full max-w-[560px]">
-            <AnimatePresence mode="wait" custom={dir}>
-              <motion.div
-                key={index}
-                custom={dir}
-                initial={{ opacity: 0, x: dir > 0 ? 40 : -40, scale: 0.96, filter: 'blur(4px)' }}
-                animate={{ opacity: 1, x: 0, scale: 1, filter: 'blur(0px)' }}
-                exit={{ opacity: 0, x: dir > 0 ? -40 : 40, scale: 0.96, filter: 'blur(4px)' }}
-                transition={{ duration: 0.5, ease: EASE }}
-                className="relative rounded-lg border border-gold-500/20 bg-white p-6 shadow-xl sm:p-8"
+      <div className="mx-auto grid max-w-7xl items-stretch gap-5 px-4 sm:px-6 lg:grid-cols-2">
+        <div className="flex flex-col">
+          <SectionHeading
+            title="What our customers say"
+            subtitle="Home cooks across Pakistan on their experience with Abdullah Kneaders."
+          />
+          <div className="flex flex-1 flex-col justify-center gap-2 rounded-3xl bg-white p-5 shadow-lg ring-1 ring-gold-500/15 sm:p-6">
+            {TESTIMONIALS.map((x, idx) => (
+              <button
+                key={x.name}
+                type="button"
+                onClick={() => setI(idx)}
+                aria-current={idx === i}
+                className={`relative overflow-hidden rounded-xl px-4 py-2 text-left transition-colors ${FOCUS} ${
+                  idx === i ? 'bg-cream shadow-sm ring-1 ring-gold-500/20' : 'hover:bg-cream/60'
+                }`}
               >
-                <span className="pointer-events-none absolute left-6 top-6 font-serif text-5xl leading-none text-gold-500/15">
-                  &ldquo;
-                </span>
-
-                <div className="flex justify-end gap-1">
-                  {Array.from({ length: TESTIMONIALS[index].rating }).map((_, i) => (
-                    <motion.svg
-                      key={i}
-                      viewBox="0 0 20 20"
-                      className="h-4 w-4 fill-gold-500"
-                      initial={{ opacity: 0, scale: 0.5, rotate: -45 }}
-                      animate={{ opacity: 1, scale: 1, rotate: 0 }}
-                      transition={{ ...SPRING, delay: 0.15 + i * 0.06 }}
-                    >
-                      <path d="M10 1.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L10 14.9 4.8 17.6l1-5.8L1.5 7.7l5.9-.9L10 1.5z" />
-                    </motion.svg>
-                  ))}
-                </div>
-
-                <p className="mt-6 font-serif text-base italic leading-relaxed text-charcoal sm:text-lg">
-                  {TESTIMONIALS[index].quote}
-                </p>
-
-                <div className="mt-6 flex items-center justify-between gap-4 border-t border-stone-200 pt-5">
-                  <div className="flex items-center gap-3">
-                    <span className="flex h-11 w-11 items-center justify-center rounded-full bg-gold-500/10 font-serif text-base text-gold-600">
-                      {TESTIMONIALS[index].name[0]}
-                    </span>
-                    <div>
-                      <p className="text-sm font-semibold text-charcoal">
-                        {TESTIMONIALS[index].name}
-                      </p>
-                      <p className="text-[11px] uppercase tracking-wider text-gold-600">
-                        {TESTIMONIALS[index].location}
-                      </p>
-                    </div>
-                  </div>
-
-                  <span className="hidden rounded-full border border-gold-500/30 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-gold-600 sm:inline-block">
-                    Verified
-                  </span>
-                </div>
-              </motion.div>
-            </AnimatePresence>
-
-            <motion.button
-              type="button"
-              onClick={prev}
-              aria-label="Previous review"
-              whileHover={{ scale: 1.12, x: -2 }}
-              whileTap={{ scale: 0.92 }}
-              transition={SPRING}
-              className="absolute left-0 top-1/2 z-20 flex h-10 w-10 -translate-x-4 -translate-y-1/2 items-center justify-center rounded-full border border-gold-500/25 bg-white text-gold-600 shadow-sm transition-colors duration-300 hover:border-gold-500 hover:bg-gold-50 sm:-translate-x-14"
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M15 18l-6-6 6-6" />
-              </svg>
-            </motion.button>
-            <motion.button
-              type="button"
-              onClick={next}
-              aria-label="Next review"
-              whileHover={{ scale: 1.12, x: 2 }}
-              whileTap={{ scale: 0.92 }}
-              transition={SPRING}
-              className="absolute right-0 top-1/2 z-20 flex h-10 w-10 translate-x-4 -translate-y-1/2 items-center justify-center rounded-full border border-gold-500/25 bg-white text-gold-600 shadow-sm transition-colors duration-300 hover:border-gold-500 hover:bg-gold-50 sm:translate-x-14"
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M9 18l6-6-6-6" />
-              </svg>
-            </motion.button>
+                <p className="text-sm font-semibold text-charcoal">{x.name}</p>
+                <p className="text-xs text-gold-600">{x.location}</p>
+                {idx === i && !paused && (
+                  <motion.span
+                    key={`${i}-bar`}
+                    initial={{ scaleX: 0 }}
+                    animate={{ scaleX: 1 }}
+                    transition={{ duration: 6.5, ease: 'linear' }}
+                    className="absolute bottom-0 left-0 h-0.5 w-full origin-left bg-gold-500"
+                  />
+                )}
+              </button>
+            ))}
           </div>
         </div>
 
-        <div className="mt-6 flex justify-center gap-2">
-          {TESTIMONIALS.map((_, i) => (
-            <button
+        <div className="relative flex min-h-[240px]">
+          <AnimatePresence mode="wait">
+            <motion.figure
               key={i}
-              type="button"
-              onClick={() => go(i)}
-              aria-label={`Go to review ${i + 1}`}
-              className="group relative h-2 transition-all duration-300"
-              style={{ width: i === index ? '40px' : '10px' }}
+              initial={{ opacity: 0, y: 20, rotate: -1 }}
+              animate={{ opacity: 1, y: 0, rotate: 0 }}
+              exit={{ opacity: 0, y: -20, rotate: 1 }}
+              transition={{ duration: 0.45, ease: EASE }}
+              className="relative flex flex-1 flex-col justify-center overflow-hidden rounded-3xl bg-white p-5 shadow-lg ring-1 ring-gold-500/15 sm:p-6"
             >
-              <motion.span
-                layout
-                className={`absolute inset-0 rounded-full transition-all duration-300 ${
-                  i === index
-                    ? 'bg-gold-500 shadow-[0_0_10px_rgba(217,96,10,0.5)]'
-                    : 'bg-stone-300 group-hover:bg-stone-400'
-                }`}
-              />
-            </button>
-          ))}
+              <span
+                aria-hidden
+                className="pointer-events-none absolute -top-2 left-4 font-serif text-8xl leading-none text-gold-500/15"
+              >
+                &ldquo;
+              </span>
+              <div className="relative flex gap-1">
+                {Array.from({ length: 5 }).map((_, s) => (
+                  <motion.span
+                    key={s}
+                    initial={{ opacity: 0, scale: 0.4, rotate: -40 }}
+                    animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                    transition={{ ...SPRING, delay: 0.15 + s * 0.06 }}
+                  >
+                    <Star className="h-4 w-4 fill-gold-500" />
+                  </motion.span>
+                ))}
+              </div>
+              <blockquote className="relative mt-3 font-serif text-lg font-normal leading-relaxed text-charcoal sm:text-xl">
+                {t.quote}
+              </blockquote>
+              <figcaption className="mt-4 flex items-center gap-3 border-t border-stone-200 pt-3">
+                <span className="flex h-9 w-9 items-center justify-center rounded-full bg-gold-500/10 font-serif text-sm text-gold-600">
+                  {t.name[0]}
+                </span>
+                <span>
+                  <span className="block text-sm font-semibold text-charcoal">{t.name}</span>
+                  <span className="block text-xs text-gold-600">{t.location}, Pakistan</span>
+                </span>
+              </figcaption>
+            </motion.figure>
+          </AnimatePresence>
         </div>
       </div>
+    </section>
+  );
+}
+
+/* ═══════════════ FAQ ═══════════════ */
+function FAQ() {
+  const [open, setOpen] = useState(0);
+  return (
+    <section className="bg-white py-8">
+      <div className="mx-auto grid max-w-7xl gap-5 px-4 sm:px-6 lg:grid-cols-[1fr_1.5fr]">
+        <div>
+          <SectionHeading title="Questions, answered" subtitle="The essentials before you order." />
+          <Reveal delay={0.1}>
+            <div className="rounded-2xl bg-cream p-4 ring-1 ring-gold-500/15">
+              <p className="font-serif text-base text-charcoal">Need a hand?</p>
+              <p className="mt-0.5 text-xs text-charcoal-light">Our team is available from 08:00 to 17:00.</p>
+              <a
+                href={PHONE_HREF}
+                className={`mt-3 inline-flex items-center gap-2 rounded-full bg-gold-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-gold-600 ${FOCUS}`}
+              >
+                <Icon name="phone" className="h-4 w-4" />
+                {PHONE}
+              </a>
+              <div className="mt-3 flex gap-4 text-sm">
+                <Link to={LINKS.contact} className="font-medium text-gold-600 hover:underline">
+                  Contact us
+                </Link>
+                <Link to={LINKS.complaint} className="font-medium text-gold-600 hover:underline">
+                  Make a complaint
+                </Link>
+              </div>
+            </div>
+          </Reveal>
+        </div>
+
+        <Reveal variant="right">
+          <div>
+            {FAQS.map((f, idx) => {
+              const isOpen = open === idx;
+              return (
+                <div key={f.q} className="border-b border-gold-500/15 first:border-t">
+                  <button
+                    type="button"
+                    onClick={() => setOpen(isOpen ? -1 : idx)}
+                    aria-expanded={isOpen}
+                    className={`flex w-full items-center justify-between gap-4 py-2.5 text-left ${FOCUS}`}
+                  >
+                    <span className="font-serif text-sm text-charcoal sm:text-base">{f.q}</span>
+                    <motion.span
+                      animate={{ rotate: isOpen ? 45 : 0 }}
+                      transition={SPRING}
+                      className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-gold-500/10 text-gold-600"
+                    >
+                      <Icon name="plus" className="h-3.5 w-3.5" />
+                    </motion.span>
+                  </button>
+                  <AnimatePresence initial={false}>
+                    {isOpen && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.3, ease: EASE }}
+                        className="overflow-hidden"
+                      >
+                        <p className="max-w-xl pb-2.5 pr-10 text-xs leading-relaxed text-charcoal-light sm:text-sm">{f.a}</p>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              );
+            })}
+          </div>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
+/* ═══════════════ Final CTA ═══════════════ */
+function FinalCta({ promoBanner, link }) {
+  const target = promoBanner?.link_url?.startsWith('/') ? promoBanner.link_url : link;
+  return (
+    <section className="bg-cream px-4 pb-8 pt-2 sm:px-6">
+      <Reveal
+        variant="scale"
+        className="relative mx-auto max-w-7xl overflow-hidden rounded-3xl bg-gradient-to-br from-gold-500 to-gold-600 px-5 py-8 text-center sm:px-10"
+      >
+        <motion.span
+          aria-hidden
+          className="absolute -left-10 -top-10 h-40 w-40 rounded-full bg-white/15"
+          animate={{ scale: [1, 1.2, 1], x: [0, 14, 0] }}
+          transition={{ duration: 7, ease: 'easeInOut', repeat: Infinity }}
+        />
+        <motion.span
+          aria-hidden
+          className="absolute -bottom-12 -right-8 h-52 w-52 rounded-full bg-charcoal/15"
+          animate={{ scale: [1, 1.15, 1], y: [0, -12, 0] }}
+          transition={{ duration: 8, ease: 'easeInOut', repeat: Infinity }}
+        />
+
+        <div className="relative">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-white/20 px-3 py-1 text-xs font-medium text-white">
+            <Icon name="tag" className="h-3.5 w-3.5" />
+            Pay by bank transfer and save ₨ 200
+          </span>
+          <h2 className="mx-auto mt-3 max-w-2xl font-serif text-2xl leading-tight text-white sm:text-3xl">
+            {promoBanner?.title || 'Effortless efficiency with a dough-kneading appliance'}
+          </h2>
+          <p className="mx-auto mt-2 max-w-xl text-sm text-white/90">
+            Pay securely through direct bank transfer today and enjoy an exclusive ₨ 200 discount on your order.
+            Trusted by home bakers and professionals across Pakistan since {FOUNDED}.
+          </p>
+
+          <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
+            <Magnetic>
+              <Link
+                to={target}
+                className={`inline-flex items-center gap-2 rounded-full bg-charcoal px-6 py-3 text-sm font-semibold text-cream shadow-lg transition-colors hover:bg-black ${FOCUS}`}
+              >
+                Explore the collection
+                <Icon name="arrow" className="h-4 w-4" />
+              </Link>
+            </Magnetic>
+            <a
+              href={PHONE_HREF}
+              className={`inline-flex items-center gap-2 rounded-full border border-white/40 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-white/10 ${FOCUS}`}
+            >
+              <Icon name="phone" className="h-4 w-4" />
+              {PHONE}
+            </a>
+          </div>
+
+          <div className="mt-4 flex items-center justify-center gap-3">
+            {[
+              { href: FACEBOOK_URL, icon: 'facebook', label: 'Abdullah Kneaders on Facebook' },
+              { href: INSTAGRAM_URL, icon: 'instagram', label: 'Abdullah Kneaders on Instagram' },
+            ].map((s) => (
+              <motion.a
+                key={s.icon}
+                href={s.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={s.label}
+                whileHover={{ y: -3, scale: 1.08 }}
+                whileTap={{ scale: 0.94 }}
+                transition={SPRING}
+                className={`flex h-9 w-9 items-center justify-center rounded-full bg-white/15 text-white transition-colors hover:bg-white/25 ${FOCUS}`}
+              >
+                <Icon name={s.icon} className="h-4 w-4" />
+              </motion.a>
+            ))}
+          </div>
+        </div>
+      </Reveal>
     </section>
   );
 }
@@ -727,698 +1669,52 @@ export default function Home() {
 
   const slides = [...(heroBanners || []), ...(secondaryBanners || [])].filter((b) => b.image_path);
   const [activeSlide, setActiveSlide] = useState(0);
-  const heroRef = useRef(null);
-  const { scrollYProgress } = useScroll({ target: heroRef, offset: ['start start', 'end start'] });
-  const smoothProgress = useSpring(scrollYProgress, { stiffness: 120, damping: 30, mass: 0.4 });
-  const heroParallax = useTransform(smoothProgress, [0, 1], [0, 120]);
-  const heroOpacity = useTransform(smoothProgress, [0, 0.8], [1, 0]);
-  const heroScale = useTransform(smoothProgress, [0, 1], [1, 1.08]);
-  const heroTextY = useTransform(smoothProgress, [0, 1], [0, -40]);
 
   useEffect(() => {
     if (slides.length <= 1) return;
-    const interval = setInterval(() => {
-      setActiveSlide((i) => (i + 1) % slides.length);
-    }, SLIDE_INTERVAL_MS);
-    return () => clearInterval(interval);
-  }, [slides.length]);
+    const t = setTimeout(() => setActiveSlide((i) => (i + 1) % slides.length), SLIDE_INTERVAL_MS);
+    return () => clearTimeout(t);
+  }, [slides.length, activeSlide]);
 
-  const hero = slides[activeSlide % slides.length];
   const topCategories = (categories || []).filter((c) => !c.parent_id);
   const firstCategoryLink = topCategories[0] ? `/category/${topCategories[0].slug}` : '/';
-  const heroLink = hero?.link_url?.startsWith('/') ? hero.link_url : firstCategoryLink;
 
   return (
-    <div className="bg-cream">
-      {/* ══════════════ HERO ══════════════ */}
-      <section ref={heroRef} className="relative overflow-hidden bg-charcoal">
-        {/* ---------- MOBILE / TABLET ---------- */}
-        <div className="lg:hidden">
-          <div className="relative">
-            <AnimatePresence mode="wait">
-              {hero?.image_path && (
-                <motion.div
-                  key={hero.id}
-                  className="relative aspect-[4/3] w-full overflow-hidden sm:aspect-[16/9]"
-                  initial={{ opacity: 0, scale: 1.08, filter: 'blur(8px)' }}
-                  animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
-                  exit={{ opacity: 0, scale: 1.08, filter: 'blur(8px)' }}
-                  transition={{ duration: 0.9, ease: EASE }}
-                >
-                  <motion.img
-                    src={assetUrl(hero.image_path)}
-                    alt=""
-                    className="h-full w-full origin-right scale-[1] object-cover object-right"
-                    animate={{ scale: [1, 1.05, 1] }}
-                    transition={{ duration: SLIDE_INTERVAL_MS / 1000, ease: 'linear' }}
-                  />
-                </motion.div>
-              )}
-            </AnimatePresence>
+    <MotionConfig reducedMotion="user">
+      <div className="bg-cream">
+        <ScrollProgress />
 
-            {slides.length > 1 && (
-              <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-1.5">
-                {slides.map((_, i) => (
-                  <button
-                    key={i}
-                    onClick={() => setActiveSlide(i)}
-                    aria-label={`Go to slide ${i + 1}`}
-                    className={`h-1 rounded-full transition-all duration-500 ${
-                      i === activeSlide ? 'w-6 bg-gold-500' : 'w-1.5 bg-cream/40 hover:bg-cream/70'
-                    }`}
-                  />
-                ))}
-              </div>
-            )}
-          </div>
-
-          {!hero?.image_path && (
-            <div className="relative bg-charcoal px-4 pb-8 pt-5 text-center">
-              <motion.div
-                initial="hidden"
-                animate="show"
-                variants={heroContainer}
-                className="mx-auto flex max-w-md flex-col items-center gap-3"
-              >
-                <motion.span
-                  variants={heroItem}
-                  className="rounded-full border border-gold-500/40 bg-gold-500/10 px-3 py-1 text-[9px] font-semibold uppercase tracking-[0.15em] text-gold-300"
-                >
-                  Sports. Fitness. Equestrian.
-                </motion.span>
-
-                <motion.h1
-                  variants={heroItem}
-                  className="font-serif text-2xl leading-tight text-cream sm:text-3xl"
-                >
-                  Gear Built for Performance
-                </motion.h1>
-
-                <motion.p variants={heroItem} className="text-xs text-stone-300 sm:text-sm">
-                  Championship belts, weight lifting belts, equestrian gear, and buckles &amp; swivels.
-                </motion.p>
-
-                <motion.div variants={heroItem} className="w-full pt-1">
-                  <Link to={heroLink} className="block">
-                    <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }} transition={SPRING}>
-                      <Button variant="gold" size="lg" className="w-full">
-                        Shop Now
-                      </Button>
-                    </motion.div>
-                  </Link>
-                </motion.div>
-              </motion.div>
-            </div>
-          )}
-        </div>
-
-        {/* ---------- DESKTOP ---------- */}
-        <div className="relative hidden lg:block">
-          <AnimatePresence mode="wait">
-            {hero?.image_path && (
-              <motion.div
-                key={hero.id}
-                className="absolute inset-0 overflow-hidden"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.9, ease: 'easeInOut' }}
-              >
-                <motion.img
-                  src={assetUrl(hero.image_path)}
-                  alt=""
-                  style={{ y: heroParallax, scale: heroScale }}
-                  className="h-full w-full object-cover object-top"
-                  initial={{ scale: 1.05 }}
-                  animate={{ scale: 1.12 }}
-                  transition={{ duration: SLIDE_INTERVAL_MS / 1000 + 1, ease: 'linear' }}
-                />
-                <div className="absolute " />
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          <motion.div
-            style={{ opacity: heroOpacity, y: heroTextY }}
-            className="relative mx-auto flex max-w-7xl flex-col items-center justify-center gap-6 px-6 py-16 text-center min-h-[calc(100vh-57px)]"
-          >
-            {!hero?.image_path && (
-              <>
-                <motion.img
-                  src="/logo.png"
-                  alt="MA Universal"
-                  className="h-20 w-20"
-                  initial={{ opacity: 0, scale: 0.8, rotate: -10 }}
-                  animate={{ opacity: 1, scale: 1, rotate: 0 }}
-                  transition={{ duration: 0.7, ease: EASE }}
-                />
-
-                <motion.div
-                  variants={heroContainer}
-                  initial="hidden"
-                  animate="show"
-                  className="flex flex-col items-center gap-6"
-                >
-                  <motion.span
-                    variants={heroItem}
-                    className="rounded-full border border-gold-500/40 bg-gold-500/10 px-3.5 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-gold-300 backdrop-blur-sm"
-                  >
-                    Sports. Fitness. Equestrian.
-                  </motion.span>
-
-                  <motion.h1
-                    variants={heroItem}
-                    className="max-w-3xl font-serif text-6xl leading-tight text-cream"
-                  >
-                    Gear Built for Performance
-                  </motion.h1>
-
-                  <motion.p variants={heroItem} className="max-w-xl text-base text-stone-300">
-                    Championship belts, weight lifting belts, equestrian gear, and buckles &amp; swivels.
-                  </motion.p>
-
-                  <motion.div variants={heroItem} className="flex flex-wrap items-center justify-center gap-3">
-                    <Link to={heroLink}>
-                      <motion.div
-                        whileHover={{ scale: 1.06 }}
-                        whileTap={{ scale: 0.95 }}
-                        animate={{ y: [0, -3, 0] }}
-                        transition={{
-                          scale: SPRING,
-                          y: { duration: 2.5, repeat: Infinity, ease: 'easeInOut' },
-                        }}
-                      >
-                        <Button variant="gold" size="lg">Shop Now</Button>
-                      </motion.div>
-                    </Link>
-                  </motion.div>
-                </motion.div>
-              </>
-            )}
-
-            {slides.length > 1 && (
-              <div className="absolute bottom-6 flex gap-1.5">
-                {slides.map((_, i) => (
-                  <button
-                    key={i}
-                    onClick={() => setActiveSlide(i)}
-                    aria-label={`Go to slide ${i + 1}`}
-                    className={`h-1 rounded-full transition-all duration-500 ${
-                      i === activeSlide ? 'w-6 bg-gold-500' : 'w-1.5 bg-cream/40 hover:bg-cream/70'
-                    }`}
-                  />
-                ))}
-              </div>
-            )}
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ══════════════ MARQUEE ══════════════ */}
-      <section className="overflow-hidden border-y border-gold-500/20 bg-charcoal py-2.5">
-        <div className="flex animate-[marquee_50s_linear_infinite] gap-10 whitespace-nowrap">
-          {Array.from({ length: 2 }).map((_, dup) => (
-            <div key={dup} className="flex gap-10">
-              {[
-                'Free Shipping over $75',
-                'Cash on Delivery',
-                'Authentic Quality',
-                'Easy Returns',
-                'Trusted by Athletes Nationwide',
-                'Premium Leather & Hardware',
-                'Championship-Grade Gear',
-                '100% Satisfaction Guaranteed',
-              ].map((t, i) => (
-                <MarqueeItem key={`${dup}-${t}`} text={t} index={i} />
-              ))}
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* ══════════════ CATEGORIES ══════════════ */}
-      <section className="bg-white py-10">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6">
-          <SectionHeading eyebrow="Explore" title="Shop by Category" />
-          <motion.div
-            variants={staggerContainer}
-            initial="hidden"
-            whileInView="show"
-            viewport={{ once: true, amount: 0.15 }}
-            className="grid grid-cols-1 gap-3 sm:grid-cols-3"
-          >
-            {topCategories.map((cat) => (
-              <motion.div
-                key={cat.slug}
-                variants={fadeUp}
-                whileHover={{ y: -8, scale: 1.02, transition: SPRING }}
-              >
-                <Link
-                  to={`/category/${cat.slug}`}
-                  className="group block overflow-hidden rounded-lg border border-gold-500/20 bg-white shadow-sm transition-all duration-300 hover:shadow-lg hover:border-gold-500/40"
-                >
-                  <div className="relative aspect-4/3 overflow-hidden bg-stone-100">
-                    {cat.banner_image ? (
-                      <img
-                        src={assetUrl(cat.banner_image)}
-                        alt=""
-                        className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
-                      />
-                    ) : (
-                      <div className="flex h-full items-center justify-center">
-                        <span className="font-serif text-4xl text-gold-400">{cat.name[0]}</span>
-                      </div>
-                    )}
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      whileHover={{ opacity: 1 }}
-                      className="absolute inset-0 bg-charcoal/20"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-charcoal/50 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-                  </div>
-                  <div className="p-3 text-center">
-                    <h3 className="font-serif text-lg text-charcoal transition-colors group-hover:text-gold-600 sm:text-xl">
-                      {cat.name}
-                    </h3>
-                    <span className="mt-0.5 inline-flex items-center gap-1 text-[10px] font-medium uppercase tracking-wider text-gold-600">
-                      Shop Now
-                      <span className="transition-transform duration-300 group-hover:translate-x-1">&rarr;</span>
-                    </span>
-                  </div>
-                </Link>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ══════════════ FEATURED PRODUCTS ══════════════ */}
-      <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
-        <SectionHeading eyebrow="Handpicked for You" title="Featured Products" />
-        {featuredLoading ? (
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
-            {Array.from({ length: 12 }).map((_, i) => (
-              <ProductCardSkeleton key={i} />
-            ))}
-          </div>
-        ) : featured?.length ? (
-          <>
-            <motion.div
-              variants={staggerContainer}
-              initial="hidden"
-              whileInView="show"
-              viewport={{ once: true, amount: 0.05 }}
-              className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4"
-            >
-              {featured.map((product) => (
-                <motion.div
-                  key={product.id}
-                  variants={fadeUp}
-                  whileHover={{ y: -6, transition: SPRING }}
-                >
-                  <ProductCard product={product} />
-                </motion.div>
-              ))}
-            </motion.div>
-            <motion.div
-              initial={{ opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, ease: EASE }}
-              className="mt-6 text-center"
-            >
-              <Link to={firstCategoryLink}>
-                <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }} transition={SPRING}>
-                  <Button variant="outline" size="lg">View All Products</Button>
-                </motion.div>
-              </Link>
-            </motion.div>
-          </>
-        ) : (
-          <p className="text-center text-charcoal-light">New products coming soon.</p>
-        )}
-      </section>
-
-      {/* ══════════════ NEW ARRIVALS ══════════════ */}
-      <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
-        <SectionHeading eyebrow="Just In" title="New Arrivals" />
-        {newArrivalsLoading ? (
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
-            {Array.from({ length: 8 }).map((_, i) => (
-              <ProductCardSkeleton key={i} />
-            ))}
-          </div>
-        ) : newArrivals?.length ? (
-          <motion.div
-            variants={staggerContainer}
-            initial="hidden"
-            whileInView="show"
-            viewport={{ once: true, amount: 0.05 }}
-            className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4"
-          >
-            {newArrivals.map((product) => (
-              <motion.div
-                key={product.id}
-                variants={fadeUp}
-                whileHover={{ y: -6, transition: SPRING }}
-              >
-                <ProductCard product={product} />
-              </motion.div>
-            ))}
-          </motion.div>
-        ) : (
-          <p className="text-center text-charcoal-light">New arrivals coming soon.</p>
-        )}
-      </section>
-
-      {/* ══════════════ STATS SECTION ══════════════ */}
-      <StatsSection />
-
-      {/* ══════════════ WHY CHOOSE US ══════════════ */}
-      <WhyChooseUs />
-
-      {/* ══════════════ TESTIMONIALS ══════════════ */}
-      <TestimonialsSection />
-
-      {/* ══════════════ OUR PROMISE ══════════════ */}
-      <section className="relative overflow-hidden bg-cream py-10 sm:py-14">
-        <div className="mx-auto grid max-w-6xl grid-cols-1 items-center gap-8 px-4 sm:px-6 lg:grid-cols-2 lg:gap-12">
-          <div className="mx-auto grid aspect-[2/1] w-full max-w-[460px] grid-cols-4 grid-rows-2 gap-2.5">
-            <motion.div
-              initial={{ opacity: 0, scale: 1.12 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.7, ease: EASE }}
-              whileHover={{ scale: 1.03, transition: SPRING }}
-              className="col-span-2 row-span-2 flex items-center justify-center overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-gold-500/15"
-            >
-              {featured?.[0]?.primary_image ? (
-                <motion.img
-                  src={assetUrl(featured[0].primary_image)}
-                  alt={featured[0].name}
-                  className="h-full w-full object-cover"
-                  whileHover={{ scale: 1.06 }}
-                  transition={{ duration: 0.5, ease: EASE }}
-                />
-              ) : (
-                <span className="font-serif text-3xl text-gold-300">{featured?.[0]?.name?.[0] || '·'}</span>
-              )}
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, scale: 1.12 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.7, delay: 0.1, ease: EASE }}
-              whileHover={{ scale: 1.05, transition: SPRING }}
-              className="flex items-center justify-center overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-gold-500/15"
-            >
-              {featured?.[1]?.primary_image ? (
-                <motion.img
-                  src={assetUrl(featured[1].primary_image)}
-                  alt={featured[1].name}
-                  className="h-full w-full object-cover"
-                  whileHover={{ scale: 1.08 }}
-                  transition={{ duration: 0.5, ease: EASE }}
-                />
-              ) : (
-                <span className="font-serif text-xl text-gold-300">{featured?.[1]?.name?.[0] || '·'}</span>
-              )}
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 12, scale: 0.9 }}
-              whileInView={{ opacity: 1, y: 0, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ ...SPRING, delay: 0.3 }}
-              whileHover={{ scale: 1.05, transition: SPRING }}
-              className="flex flex-col items-center justify-center gap-0.5 rounded-xl bg-charcoal px-2 text-center shadow-sm"
-            >
-              <span className="flex items-center gap-1 font-serif text-lg text-cream">
-                4.9 <span className="text-gold-400">★</span>
-              </span>
-              <span className="text-[8px] font-semibold uppercase tracking-wider text-stone-400">Rated</span>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, scale: 1.12 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.7, delay: 0.2, ease: EASE }}
-              whileHover={{ scale: 1.05, transition: SPRING }}
-              className="flex items-center justify-center overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-gold-500/15"
-            >
-              {featured?.[2]?.primary_image ? (
-                <motion.img
-                  src={assetUrl(featured[2].primary_image)}
-                  alt={featured[2].name}
-                  className="h-full w-full object-cover"
-                  whileHover={{ scale: 1.08 }}
-                  transition={{ duration: 0.5, ease: EASE }}
-                />
-              ) : (
-                <span className="font-serif text-xl text-gold-300">{featured?.[2]?.name?.[0] || '·'}</span>
-              )}
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 12, scale: 0.9 }}
-              whileInView={{ opacity: 1, y: 0, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ ...SPRING, delay: 0.4 }}
-              whileHover={{ scale: 1.05, transition: SPRING }}
-              className="flex flex-col items-center justify-center gap-1 rounded-xl bg-gold-500 px-2 text-center shadow-sm"
-            >
-              <motion.span
-                animate={{ opacity: [0.6, 1, 0.6], scale: [0.9, 1.1, 0.9] }}
-                transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-                className="h-1.5 w-1.5 rounded-full bg-white"
-              />
-              <span className="text-[9px] font-semibold uppercase tracking-[0.15em] text-white">Handpicked</span>
-            </motion.div>
-          </div>
-
-          <motion.div
-            initial={{ opacity: 0, x: 40 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, ease: EASE, delay: 0.15 }}
-            className="flex h-full flex-col justify-center"
-          >
-            <motion.span
-              initial={{ opacity: 0, x: -20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.2, ease: EASE }}
-              className="mb-1.5 flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-gold-600"
-            >
-              <motion.span
-                initial={{ scaleX: 0 }}
-                whileInView={{ scaleX: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.7, ease: EASE, delay: 0.25 }}
-                className="h-px w-5 origin-left bg-gold-400"
-              />
-              Our Promise
-            </motion.span>
-            <motion.h2
-              initial={{ opacity: 0, y: 16, filter: 'blur(6px)' }}
-              whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.7, delay: 0.25, ease: EASE }}
-              className="font-serif text-2xl leading-tight text-charcoal sm:text-3xl lg:text-4xl"
-            >
-              Built for Performance, <span className="text-gold-600">Delivered with Care.</span>
-            </motion.h2>
-            <motion.p
-              initial={{ opacity: 0, y: 12 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.35, ease: EASE }}
-              className="mt-3 max-w-lg text-sm leading-relaxed text-charcoal-light"
-            >
-              Every belt, buckle, and piece of equestrian gear is thoughtfully sourced and quality-checked before it
-              reaches your doorstep — because your training and competition deserve nothing less. From material
-              selection to final stitch, every step is handled with the same care you bring to your sport.
-            </motion.p>
-
-            <div className="mt-5 grid grid-cols-2 gap-2.5">
-              {[
-                {
-                  label: 'Premium leather & hardware',
-                  icon: (
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="h-4 w-4">
-                      <path d="M12.5 2H4a2 2 0 0 0-2 2v8.5a2 2 0 0 0 .59 1.41l9 9a2 2 0 0 0 2.82 0l7.5-7.5a2 2 0 0 0 0-2.82l-9-9A2 2 0 0 0 12.5 2Z" />
-                      <circle cx="7.5" cy="7.5" r="1.5" fill="currentColor" stroke="none" />
-                    </svg>
-                  ),
-                },
-                {
-                  label: 'Cash on Delivery nationwide',
-                  icon: (
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="h-4 w-4">
-                      <path d="M2 6h11v11H2zM13 10h4l4 4v3h-8z" />
-                      <circle cx="6.5" cy="19" r="1.8" />
-                      <circle cx="16.5" cy="19" r="1.8" />
-                    </svg>
-                  ),
-                },
-                {
-                  label: 'Inspected before shipment',
-                  icon: (
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="h-4 w-4">
-                      <circle cx="11" cy="11" r="7" />
-                      <path d="m8.5 11 2 2 4-4" />
-                      <path d="m21 21-3.5-3.5" />
-                    </svg>
-                  ),
-                },
-                {
-                  label: 'Fast, careful packaging',
-                  icon: (
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="h-4 w-4">
-                      <rect x="3" y="8" width="18" height="13" rx="1" />
-                      <path d="M3 8V6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v2M12 4v17" />
-                    </svg>
-                  ),
-                },
-              ].map((f, i) => (
-                <motion.div
-                  key={f.label}
-                  initial={{ opacity: 0, y: 12, scale: 0.95 }}
-                  whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ ...SPRING, delay: 0.4 + i * 0.08 }}
-                  whileHover={{ y: -3, scale: 1.02, transition: SPRING }}
-                  className="flex items-center gap-2 rounded-lg border border-gold-500/15 bg-white px-3 py-2.5 shadow-sm transition-shadow duration-300 hover:shadow-md"
-                >
-                  <motion.span
-                    whileHover={{ rotate: [0, -10, 10, 0], transition: { duration: 0.5 } }}
-                    className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gold-500/10 text-gold-600"
-                  >
-                    {f.icon}
-                  </motion.span>
-                  <span className="text-xs font-medium text-charcoal">{f.label}</span>
-                </motion.div>
-              ))}
-            </div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.7, ease: EASE }}
-              className="mt-5 flex flex-wrap gap-3"
-            >
-              <Link to={firstCategoryLink}>
-                <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }} transition={SPRING}>
-                  <Button variant="gold" size="lg">Shop the Collection</Button>
-                </motion.div>
-              </Link>
-              <Link to="/about">
-                <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }} transition={SPRING}>
-                  <Button variant="outline" size="lg">Our Story</Button>
-                </motion.div>
-              </Link>
-            </motion.div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ══════════════ FOLLOW OUR JOURNEY (Instagram) ══════════════ */}
-      <section className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
-        <SectionHeading
-          eyebrow="@mauniversal"
-          title="Follow Our Journey"
-          subtitle="Discover the latest from MA Universal, straight from our Instagram."
+        <Hero
+          slides={slides}
+          active={activeSlide}
+          setActive={setActiveSlide}
+          firstCategoryLink={firstCategoryLink}
         />
 
-        {/* Reels row */}
-        <div className="mb-8 flex justify-center gap-4 overflow-x-auto pb-2">
-          {INSTAGRAM_REEL_URLS.map((url) => (
-            <div key={url} className="shrink-0">
-              <InstagramEmbed url={url} />
-            </div>
-          ))}
-        </div>
+        <section className="border-y border-gold-500/20 bg-charcoal py-2">
+          <Marquee items={MARQUEE_ITEMS} speed={45} />
+        </section>
 
-        {/* Posts row */}
-        <div className="flex justify-center gap-4 overflow-x-auto pb-2">
-          {INSTAGRAM_POST_URLS.map((url) => (
-            <div key={url} className="shrink-0">
-              <InstagramEmbed url={url} />
-            </div>
-          ))}
-        </div>
-      </section>
+        <Categories categories={topCategories} />
 
-      {/* ══════════════ PROMO CTA ══════════════ */}
-      <section className="relative overflow-hidden bg-cream">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.7, ease: EASE }}
-          className="relative mx-auto max-w-3xl px-4 py-14 text-center sm:px-6"
-        >
-          <div className="mb-1 flex items-center justify-center gap-3">
-            <motion.span
-              initial={{ scaleX: 0 }}
-              whileInView={{ scaleX: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8, ease: EASE, delay: 0.1 }}
-              className="h-px w-10 origin-right bg-gradient-to-r from-transparent to-gold-500/60"
-            />
-            <span className="text-[10px] font-semibold uppercase tracking-[0.3em] text-gold-600">
-              Cash on Delivery, Nationwide
-            </span>
-            <motion.span
-              initial={{ scaleX: 0 }}
-              whileInView={{ scaleX: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8, ease: EASE, delay: 0.1 }}
-              className="h-px w-10 origin-left bg-gradient-to-l from-transparent to-gold-500/60"
-            />
-          </div>
+        <ProductsShowcase
+          featured={featured}
+          featuredLoading={featuredLoading}
+          newArrivals={newArrivals}
+          newArrivalsLoading={newArrivalsLoading}
+          viewAllLink={firstCategoryLink}
+        />
 
-          <motion.h2
-            initial={{ opacity: 0, y: 16, filter: 'blur(6px)' }}
-            whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7, delay: 0.15, ease: EASE }}
-            className="font-serif text-2xl leading-tight text-charcoal sm:text-3xl lg:text-4xl"
-          >
-            {promoBanner?.title || 'Gear Up With Confidence'}
-          </motion.h2>
-
-          <motion.p
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.25, ease: EASE }}
-            className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-charcoal-light sm:text-base"
-          >
-            Championship belts, lifting belts, equestrian gear, and buckles &amp; swivels — sourced with care and
-            delivered anywhere, with payment on arrival.
-          </motion.p>
-
-          <Link
-            to={promoBanner?.link_url?.startsWith('/') ? promoBanner.link_url : firstCategoryLink}
-            className="mt-6 inline-block"
-          >
-            <motion.div
-              initial={{ opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.35, ease: EASE }}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.96 }}
-            >
-              <Button variant="gold" size="lg">Explore the Collection</Button>
-            </motion.div>
-          </Link>
-        </motion.div>
-      </section>
-    </div>
+        <Process />
+        <Kneading link={firstCategoryLink} />
+        <StatsSection />
+        <Why />
+        <Capacity link={firstCategoryLink} />
+        <Story />
+        <Testimonials />
+        <FAQ />
+        <FinalCta promoBanner={promoBanner} link={firstCategoryLink} />
+      </div>
+    </MotionConfig>
   );
 }

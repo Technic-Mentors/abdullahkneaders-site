@@ -237,14 +237,14 @@ export default function ProductForm() {
             />
             <Input label="Material" maxLength={100} {...register('fabric')} />
             <Input
-              label="Base Price ($)"
+              label="Base Price (Rs.)"
               type="number"
               step="0.01"
               min="0.01"
               error={errors.basePrice?.message}
               {...register('basePrice', { required: 'Base price is required', min: 0.01 })}
             />
-            <Input label="Compare-at Price ($)" type="number" step="0.01" min="0.01" {...register('compareAtPrice')} />
+            <Input label="Compare-at Price (Rs.)" type="number" step="0.01" min="0.01" {...register('compareAtPrice')} />
             <div className="flex items-center gap-4 pt-6">
               <label className="flex items-center gap-2 text-sm text-charcoal">
                 <input type="checkbox" {...register('isFeatured')} className="h-4 w-4 rounded border-stone-300" />
@@ -283,19 +283,44 @@ export default function ProductForm() {
             {fields.map((field, idx) => (
               <div key={field.id} className="flex flex-wrap items-end gap-3 rounded-md border border-stone-200 p-3">
                 <div className="w-28 flex-1 min-w-[7rem]">
-                  <Input label="Size" maxLength={30} {...register(`variants.${idx}.size`, { required: true })} />
+                  <Input
+                    label="Size"
+                    maxLength={30}
+                    error={errors.variants?.[idx]?.size?.message}
+                    {...register(`variants.${idx}.size`, { required: 'Required' })}
+                  />
                 </div>
                 <div className="w-28 flex-1 min-w-[7rem]">
-                  <Input label="Color" maxLength={50} {...register(`variants.${idx}.color`, { required: true })} />
+                  <Input
+                    label="Color"
+                    maxLength={50}
+                    error={errors.variants?.[idx]?.color?.message}
+                    {...register(`variants.${idx}.color`, { required: 'Required' })}
+                  />
                 </div>
                 <div className="w-36 flex-1 min-w-[9rem]">
-                  <Input label="SKU" maxLength={64} {...register(`variants.${idx}.sku`, { required: true })} />
+                  <Input
+                    label="SKU"
+                    maxLength={64}
+                    error={errors.variants?.[idx]?.sku?.message}
+                    {...register(`variants.${idx}.sku`, { required: 'Required' })}
+                  />
                 </div>
                 <div className="w-32 flex-1 min-w-[8rem]">
                   <Input label="Price Override" type="number" step="0.01" min="0.01" {...register(`variants.${idx}.priceOverride`)} />
                 </div>
                 <div className="w-28 flex-1 min-w-[7rem]">
-                  <Input label="Stock Qty" type="number" min="0" step="1" {...register(`variants.${idx}.stockQuantity`, { required: true, min: 0 })} />
+                  <Input
+                    label="Stock Qty"
+                    type="number"
+                    min="0"
+                    step="1"
+                    error={errors.variants?.[idx]?.stockQuantity?.message}
+                    {...register(`variants.${idx}.stockQuantity`, {
+                      required: 'Required',
+                      min: { value: 0, message: 'Must be 0 or more' },
+                    })}
+                  />
                 </div>
                 <div className="w-32 flex-1 min-w-[8rem]">
                   <Input label="Low Stock At" type="number" min="0" step="1" {...register(`variants.${idx}.lowStockThreshold`)} />
