@@ -8,7 +8,7 @@
 export const BRAND_NAME = 'Abdullah Kneaders';
 export const DEV_BACKEND_PORT = 3006;
 export const DEV_FRONTEND_PORT = 5174;
-export const PROD_API_URL = 'https://backend.abdullahkneaders.com'; // placeholder until real domain is bought
+export const PROD_API_URL = 'https://backend.abdullahkneaders.com';
 
 // --- Libas-e-Haram (reference/rollback) ---
 // export const BRAND_NAME = 'Libas-e-Haram';
