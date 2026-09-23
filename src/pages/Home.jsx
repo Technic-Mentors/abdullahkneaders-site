@@ -441,93 +441,14 @@ function Marquee({ items, speed = 40, reverse = false }) {
   );
 }
 
-/* ═══════════════ Hero visual (animated kneader) ═══════════════ */
-function HeroVisual() {
-  const chips = [
-    { label: 'Roti', cls: 'left-0 top-[20%]', d: 0 },
-    { label: 'Naan', cls: 'right-0 top-[32%]', d: 0.6 },
-    { label: 'Pizza', cls: 'left-[2%] bottom-[8%]', d: 1.2 },
-    { label: 'Pastry', cls: 'right-[4%] bottom-[14%]', d: 1.8 },
-  ];
-  return (
-    <div
-      className="relative mx-auto aspect-square w-full max-w-[280px] sm:max-w-[340px] lg:max-w-[400px]"
-      aria-hidden
-    >
-      <motion.div
-        className="absolute inset-[3%] rounded-full border border-dashed border-gold-400/40"
-        animate={{ rotate: 360 }}
-        transition={{ duration: 50, ease: 'linear', repeat: Infinity }}
-      />
-      <div className="absolute inset-[14%] rounded-full bg-gold-500/20 blur-2xl" />
-      <motion.div
-        className="absolute inset-[12%] rounded-full border border-white/10"
-        animate={{ scale: [1, 1.05, 1] }}
-        transition={{ duration: 4, ease: 'easeInOut', repeat: Infinity }}
-      />
-
-      <div className="absolute left-1/2 top-[8%] z-20 flex h-[11%] w-[44%] -translate-x-1/2 items-center justify-between rounded-2xl bg-gradient-to-b from-gold-400 to-gold-600 px-3 shadow-lg shadow-gold-500/30">
-        <span className="text-xs font-semibold text-white">5 min</span>
-        <motion.span
-          className="h-2 w-2 rounded-full bg-white"
-          animate={{ opacity: [0.3, 1, 0.3] }}
-          transition={{ duration: 1.2, repeat: Infinity }}
-        />
-      </div>
-
-      <motion.div
-        className="absolute left-[calc(50%-5px)] top-[18%] z-10 h-[38%] w-2.5 origin-top rounded-full bg-gradient-to-b from-stone-200 to-stone-400"
-        animate={{ rotate: [-16, 16, -16] }}
-        transition={{ duration: 3.4, ease: 'easeInOut', repeat: Infinity }}
-      >
-        <span className="absolute -bottom-2 left-1/2 h-7 w-7 -translate-x-1/2 rounded-full border-[5px] border-stone-300 border-t-transparent" />
-      </motion.div>
-
-      <div className="absolute bottom-[14%] left-[14%] right-[14%] z-10 h-[36%] overflow-hidden rounded-b-[999px] rounded-t-2xl border-2 border-gold-300/50 bg-white/5 backdrop-blur-sm">
-        <motion.div
-          className="absolute bottom-0 left-[5%] right-[5%] bg-cream"
-          animate={{
-            height: ['52%', '70%', '52%'],
-            borderRadius: [
-              '48% 52% 30% 30% / 70% 65% 35% 35%',
-              '55% 45% 30% 30% / 60% 70% 30% 40%',
-              '48% 52% 30% 30% / 70% 65% 35% 35%',
-            ],
-          }}
-          transition={{ duration: 3.4, ease: 'easeInOut', repeat: Infinity }}
-        />
-      </div>
-
-      {Array.from({ length: 8 }).map((_, i) => (
-        <motion.span
-          key={i}
-          className="absolute z-20 h-1.5 w-1.5 rounded-full bg-cream/70"
-          style={{ left: `${28 + ((i * 17) % 44)}%`, bottom: '46%' }}
-          animate={{ y: [0, -60 - (i % 3) * 20], opacity: [0, 0.9, 0] }}
-          transition={{ duration: 2.6 + (i % 4) * 0.4, repeat: Infinity, delay: i * 0.35, ease: 'easeOut' }}
-        />
-      ))}
-
-      {chips.map((c) => (
-        <motion.span
-          key={c.label}
-          className={`absolute z-30 rounded-full border border-white/15 bg-charcoal/70 px-3 py-1 text-xs font-medium text-cream backdrop-blur ${c.cls}`}
-          animate={{ y: [0, -8, 0] }}
-          transition={{ duration: 4, ease: 'easeInOut', repeat: Infinity, delay: c.d }}
-        >
-          {c.label}
-        </motion.span>
-      ))}
-    </div>
-  );
-}
-
 /* ═══════════════ Hero ═══════════════ */
 function Hero({ slides, active, setActive, firstCategoryLink }) {
   const ref = useRef(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end start'] });
   const glowY = useTransform(scrollYProgress, [0, 1], [0, 90]);
-  const current = slides.length ? slides[active % slides.length] : null;
+
+  const hasBanners = slides.length > 0;
+  const current = hasBanners ? slides[active % slides.length] : null;
   const bannerLink = current?.link_url?.startsWith('/') ? current.link_url : firstCategoryLink;
   const go = (n) => setActive((n + slides.length) % slides.length);
 
@@ -537,8 +458,45 @@ function Hero({ slides, active, setActive, firstCategoryLink }) {
     { icon: 'tag', text: '₨ 200 off on bank transfer' },
   ];
 
+  const highlights = [
+    { label: '5 minutes', text: 'from flour to dough' },
+    { label: '3.5 & 5 kg', text: 'two kitchen-ready sizes' },
+    { label: 'Atta · Maida · Qeema', text: 'one machine, every dough' },
+  ];
+
   return (
-    <section ref={ref} className="relative overflow-hidden bg-charcoal">
+    <section
+      ref={ref}
+      className="relative isolate min-h-[80vh] overflow-hidden bg-charcoal lg:min-h-[90vh]"
+    >
+      {/* ─── Background: banners if available, otherwise the static hero image ─── */}
+      {hasBanners ? (
+        <>
+          {slides.map((s, i) => (
+            <motion.img
+              key={s.id ?? i}
+              src={assetUrl(s.image_path)}
+              alt=""
+              aria-hidden
+              className="pointer-events-none absolute inset-0 -z-20 h-full w-full object-cover object-center"
+              animate={{ opacity: i === active ? 1 : 0, scale: i === active ? 1 : 1.06 }}
+              transition={{ duration: 0.9, ease: EASE }}
+            />
+          ))}
+          <Link to={bannerLink} aria-label="View offer" className="absolute inset-0 -z-10" />
+        </>
+      ) : (
+        <img
+          src="/hero-image.jfif"
+          alt=""
+          aria-hidden
+          className="pointer-events-none absolute inset-0 -z-20 h-full w-full object-cover object-right"
+        />
+      )}
+
+      {/* ─── Readability overlay (works for both banners and image) ─── */}
+      <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-r from-charcoal via-charcoal/85 to-charcoal/30 lg:from-charcoal lg:via-charcoal/70 lg:to-transparent" />
+
       <motion.div
         aria-hidden
         style={{ y: glowY }}
@@ -549,32 +507,53 @@ function Hero({ slides, active, setActive, firstCategoryLink }) {
         className="pointer-events-none absolute inset-0 opacity-[0.07] [background-image:radial-gradient(#fff_1px,transparent_1px)] [background-size:22px_22px]"
       />
 
-      <div className="relative mx-auto grid max-w-7xl items-center gap-4 px-4 pb-4 pt-6 sm:px-6 lg:grid-cols-[1.1fr_0.9fr] lg:pt-8">
-        <div className="text-center lg:text-left">
+      {/* ─── Content ─── */}
+      <div className="relative mx-auto flex min-h-[80vh] max-w-7xl flex-col justify-center px-4 py-16 sm:px-6 lg:min-h-[90vh] lg:py-24">
+        <div className="max-w-2xl text-center lg:text-left">
           <Badge dark>Making dough easier since {FOUNDED}</Badge>
-          <h1 className="mt-2 font-serif text-4xl leading-[1.05] text-cream sm:text-5xl lg:text-6xl">
-            <span className="block">
-              <WordReveal text="Pakistan's original" />
-            </span>
-            <span className="block text-gold-300">
-              <WordReveal text="dough maker." delay={0.25} />
-            </span>
-          </h1>
+
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, ease: EASE, delay: 0.1 }}
+            className="mt-3 font-serif text-4xl leading-[1.05] text-cream sm:text-5xl lg:text-6xl"
+          >
+            <span className="block">Pakistan&rsquo;s original</span>
+            <span className="block text-gold-300">dough maker.</span>
+          </motion.h1>
+
           <motion.p
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, ease: EASE, delay: 0.5 }}
-            className="mx-auto mt-2 max-w-xl text-sm text-stone-300 sm:text-base lg:mx-0"
+            transition={{ duration: 0.6, ease: EASE, delay: 0.35 }}
+            className="mx-auto mt-4 max-w-xl text-sm text-stone-200 sm:text-base lg:mx-0"
           >
             Roti, naan, pizza or pastry. Atta, maida or qeema. Add flour and water, close the lid, and get evenly
             kneaded dough in five minutes.
           </motion.p>
 
+          <motion.ul
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: EASE, delay: 0.5 }}
+            className="mt-6 grid grid-cols-1 gap-3 text-left sm:grid-cols-3"
+          >
+            {highlights.map((h) => (
+              <li
+                key={h.label}
+                className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 backdrop-blur-sm"
+              >
+                <p className="font-serif text-lg text-gold-300">{h.label}</p>
+                <p className="mt-0.5 text-xs text-stone-300">{h.text}</p>
+              </li>
+            ))}
+          </motion.ul>
+
           <motion.div
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: EASE, delay: 0.65 }}
-            className="mt-4 flex flex-wrap items-center justify-center gap-3 lg:justify-start"
+            className="mt-6 flex flex-wrap items-center justify-center gap-3 lg:justify-start"
           >
             <Magnetic>
               <Link to={firstCategoryLink}>
@@ -585,7 +564,7 @@ function Hero({ slides, active, setActive, firstCategoryLink }) {
             </Magnetic>
             <a
               href="#how-it-works"
-              className={`inline-flex items-center gap-2 rounded-full border border-white/20 px-5 py-2.5 text-sm font-medium text-cream transition-colors hover:bg-white/10 ${FOCUS}`}
+              className={`inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/5 px-5 py-2.5 text-sm font-medium text-cream backdrop-blur transition-colors hover:bg-white/15 ${FOCUS}`}
             >
               <span className="flex h-6 w-6 items-center justify-center rounded-full bg-gold-500 text-white">
                 <Icon name="play" className="h-3 w-3" />
@@ -599,7 +578,7 @@ function Hero({ slides, active, setActive, firstCategoryLink }) {
             initial="hidden"
             animate="show"
             transition={{ delayChildren: 0.85 }}
-            className="mt-4 flex flex-wrap justify-center gap-x-4 gap-y-1.5 text-xs text-stone-300 lg:justify-start"
+            className="mt-6 flex flex-wrap justify-center gap-x-5 gap-y-2 text-xs text-stone-200 lg:justify-start"
           >
             {trust.map((t) => (
               <motion.li key={t.text} variants={ITEM} className="flex items-center gap-1.5">
@@ -609,71 +588,50 @@ function Hero({ slides, active, setActive, firstCategoryLink }) {
             ))}
           </motion.ul>
         </div>
-
-        <HeroVisual />
       </div>
 
-      {slides.length > 0 && (
-        <div className="relative mx-auto max-w-7xl px-4 pb-4 sm:px-6">
-          <Reveal variant="scale" className="group relative overflow-hidden rounded-2xl ring-1 ring-white/10">
-            <div className="relative aspect-[4/3] w-full bg-charcoal sm:aspect-[16/7] lg:aspect-[16/5]">
-              {slides.map((s, i) => (
-                <motion.img
-                  key={s.id ?? i}
-                  src={assetUrl(s.image_path)}
-                  alt=""
-                  className="absolute inset-0 h-full w-full object-cover object-right lg:object-center"
-                  animate={{ opacity: i === active ? 1 : 0, scale: i === active ? 1 : 1.06 }}
-                  transition={{ duration: 0.9, ease: EASE }}
-                />
-              ))}
-              <Link to={bannerLink} aria-label="View offer" className="absolute inset-0 z-10" />
-
-              {slides.length > 1 && (
-                <>
-                  <button
-                    type="button"
-                    onClick={() => go(active - 1)}
-                    aria-label="Previous slide"
-                    className={`absolute left-3 top-1/2 z-20 hidden h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-charcoal/60 text-cream opacity-0 backdrop-blur transition group-hover:opacity-100 hover:bg-gold-500 sm:flex ${FOCUS}`}
-                  >
-                    <Icon name="left" className="h-4 w-4" />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => go(active + 1)}
-                    aria-label="Next slide"
-                    className={`absolute right-3 top-1/2 z-20 hidden h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-charcoal/60 text-cream opacity-0 backdrop-blur transition group-hover:opacity-100 hover:bg-gold-500 sm:flex ${FOCUS}`}
-                  >
-                    <Icon name="right" className="h-4 w-4" />
-                  </button>
-                  <div className="absolute bottom-3 left-3 right-3 z-20 flex justify-center gap-1.5">
-                    {slides.map((_, i) => (
-                      <button
-                        key={i}
-                        type="button"
-                        onClick={() => setActive(i)}
-                        aria-label={`Go to slide ${i + 1}`}
-                        className={`h-1 w-full max-w-14 overflow-hidden rounded-full bg-white/30 ${FOCUS}`}
-                      >
-                        {i < active && <span className="block h-full w-full bg-gold-400" />}
-                        {i === active && (
-                          <motion.span
-                            key={active}
-                            initial={{ scaleX: 0 }}
-                            animate={{ scaleX: 1 }}
-                            transition={{ duration: SLIDE_INTERVAL_MS / 1000, ease: 'linear' }}
-                            className="block h-full w-full origin-left bg-gold-400"
-                          />
-                        )}
-                      </button>
-                    ))}
-                  </div>
-                </>
-              )}
-            </div>
-          </Reveal>
-        </div>
+      {/* ─── Banner controls (only when there are multiple banners) ─── */}
+      {hasBanners && slides.length > 1 && (
+        <>
+          <button
+            type="button"
+            onClick={() => go(active - 1)}
+            aria-label="Previous slide"
+            className={`absolute left-3 top-1/2 z-20 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-charcoal/60 text-cream backdrop-blur transition hover:bg-gold-500 sm:flex ${FOCUS}`}
+          >
+            <Icon name="left" className="h-4 w-4" />
+          </button>
+          <button
+            type="button"
+            onClick={() => go(active + 1)}
+            aria-label="Next slide"
+            className={`absolute right-3 top-1/2 z-20 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-charcoal/60 text-cream backdrop-blur transition hover:bg-gold-500 sm:flex ${FOCUS}`}
+          >
+            <Icon name="right" className="h-4 w-4" />
+          </button>
+          <div className="absolute bottom-5 left-1/2 z-20 flex -translate-x-1/2 gap-2">
+            {slides.map((_, i) => (
+              <button
+                key={i}
+                type="button"
+                onClick={() => setActive(i)}
+                aria-label={`Go to slide ${i + 1}`}
+                className={`h-1.5 w-10 overflow-hidden rounded-full bg-white/30 ${FOCUS}`}
+              >
+                {i < active && <span className="block h-full w-full bg-gold-400" />}
+                {i === active && (
+                  <motion.span
+                    key={active}
+                    initial={{ scaleX: 0 }}
+                    animate={{ scaleX: 1 }}
+                    transition={{ duration: SLIDE_INTERVAL_MS / 1000, ease: 'linear' }}
+                    className="block h-full w-full origin-left bg-gold-400"
+                  />
+                )}
+              </button>
+            ))}
+          </div>
+        </>
       )}
     </section>
   );

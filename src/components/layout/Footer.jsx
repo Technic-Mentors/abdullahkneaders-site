@@ -22,7 +22,7 @@ export default function Footer() {
   const { data: settings } = useAsync(() => getPublicSettings(), []);
 
   return (
-    <footer className="relative mt-2 overflow-hidden border-t border-stone-200 bg-white text-charcoal">
+    <footer className="relative overflow-hidden border-t border-stone-200 bg-white text-charcoal">
       {/* Gold top accent line */}
       <div className="h-px w-full bg-gradient-to-r from-transparent via-gold-500 to-transparent" />
 
@@ -40,11 +40,11 @@ export default function Footer() {
       />
 
       {/* ══════════════ MAIN GRID ══════════════ */}
-      <div className="relative mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:py-10">
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 lg:gap-8">
+      <div className="relative mx-auto max-w-7xl px-4 py-5 sm:px-6 lg:py-6">
+        <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4 lg:gap-6">
           {/* ── Brand column ── */}
           <div className="lg:pr-4">
-            <Link to="/" className="mb-3 inline-flex items-center gap-2.5 group">
+            <Link to="/" className="mb-2 inline-flex items-center gap-2.5 group">
               <img
                 src="/logo.png"
                 alt="Abdullah Kneaders"
@@ -61,7 +61,7 @@ export default function Footer() {
             </p>
 
             {/* Social icons */}
-            <div className="mt-4 flex items-center gap-1.5">
+            <div className="mt-3 flex items-center gap-1.5">
               <SocialLink
                 href={`https://wa.me/${WHATSAPP_NUMBER}`}
                 label="WhatsApp"
@@ -74,11 +74,11 @@ export default function Footer() {
 
           {/* ── Shop links ── */}
           <div>
-            <h4 className="mb-3 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-gold-500">
+            <h4 className="mb-2 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-gold-500">
               <span className="h-px w-3 bg-gold-500" />
               Shop
             </h4>
-            <ul className="space-y-1.5 text-sm">
+            <ul className="space-y-1 text-sm">
               {topCategories.map((category) => (
                 <FooterLink key={category.id} to={`/category/${category.slug}`}>
                   {category.name}
@@ -92,11 +92,11 @@ export default function Footer() {
 
           {/* ── Help + Contact ── */}
           <div>
-            <h4 className="mb-3 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-gold-500">
+            <h4 className="mb-2 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-gold-500">
               <span className="h-px w-3 bg-gold-500" />
               Help
             </h4>
-            <ul className="space-y-1.5 text-sm">
+            <ul className="space-y-1 text-sm">
               <FooterLink to="/track-order">Track Order</FooterLink>
               <FooterLink to="/faq">FAQs</FooterLink>
               <FooterLink to="/size-guide">Size Guide</FooterLink>
@@ -106,7 +106,7 @@ export default function Footer() {
             </ul>
 
             {/* Contact block */}
-            <div className="mt-3 space-y-1 border-t border-gold-500/15 pt-3">
+            <div className="mt-2 space-y-1 border-t border-gold-500/15 pt-2">
               <p className="flex items-start gap-1.5 text-[11px] text-charcoal-light">
                 <PinIconSmall />
                 <span>{settings?.store_address || 'Gondlanwala Rd, Gobandgarh, Gujranwala, 52250'}</span>
@@ -123,11 +123,11 @@ export default function Footer() {
 
           {/* ── Why shop with us ── */}
           <div>
-            <h4 className="mb-3 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-gold-500">
+            <h4 className="mb-2 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-gold-500">
               <span className="h-px w-3 bg-gold-500" />
               Why Shop With Us
             </h4>
-            <ul className="space-y-2">
+            <ul className="space-y-1.5">
               {TRUST_POINTS.map(({ icon: Icon, label, description }) => (
                 <li key={label} className="flex items-start gap-2.5">
                   <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-gold-500/25 bg-gold-500/5 text-gold-600">
@@ -146,7 +146,7 @@ export default function Footer() {
 
       {/* ══════════════ BOTTOM BAR ══════════════ */}
       <div className="relative border-t border-gold-500/15">
-        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-2 px-4 py-3 text-[11px] text-charcoal-light sm:flex-row sm:px-6">
+        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-2 px-4 py-2.5 text-[11px] text-charcoal-light sm:flex-row sm:px-6">
           <p className="text-center sm:text-left">
             © {new Date().getFullYear()} Abdullah Kneaders. All rights reserved.
           </p>
