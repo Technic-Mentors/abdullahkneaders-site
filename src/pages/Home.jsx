@@ -478,7 +478,7 @@ function Hero({ slides, active, setActive, firstCategoryLink }) {
               src={assetUrl(s.image_path)}
               alt=""
               aria-hidden
-              className="pointer-events-none absolute inset-0 -z-20 h-full w-full object-cover object-center"
+   className="pointer-events-none absolute inset-0 -z-20 h-full w-full object-contain object-center sm:object-cover sm:object-right"
               animate={{ opacity: i === active ? 1 : 0, scale: i === active ? 1 : 1.06 }}
               transition={{ duration: 0.9, ease: EASE }}
             />
@@ -486,16 +486,16 @@ function Hero({ slides, active, setActive, firstCategoryLink }) {
           <Link to={bannerLink} aria-label="View offer" className="absolute inset-0 -z-10" />
         </>
       ) : (
-        <img
-          src="/hero-image.jfif"
-          alt=""
-          aria-hidden
-          className="pointer-events-none absolute inset-0 -z-20 h-full w-full object-cover object-right"
-        />
+  <img
+  src="/hero-image.jfif"
+  alt=""
+  aria-hidden
+ className="pointer-events-none absolute inset-0 -z-20 h-full w-full object-contain object-center sm:object-cover sm:object-right"
+/>
       )}
 
       {/* ─── Readability overlay (works for both banners and image) ─── */}
-      <div className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-r from-charcoal via-charcoal/85 to-charcoal/30 lg:from-charcoal lg:via-charcoal/70 lg:to-transparent" />
+     <div className="pointer-events-none absolute inset-0 -z-10 hidden lg:block lg:bg-gradient-to-r lg:from-charcoal lg:via-charcoal/70 lg:to-transparent" />
 
       <motion.div
         aria-hidden
@@ -541,7 +541,7 @@ function Hero({ slides, active, setActive, firstCategoryLink }) {
             {highlights.map((h) => (
               <li
                 key={h.label}
-                className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 backdrop-blur-sm"
+                className="rounded-2xl border border-white/10 px-4 py-3"
               >
                 <p className="font-serif text-lg text-gold-300">{h.label}</p>
                 <p className="mt-0.5 text-xs text-stone-300">{h.text}</p>
