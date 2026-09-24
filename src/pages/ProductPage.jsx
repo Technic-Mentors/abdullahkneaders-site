@@ -135,7 +135,9 @@ export default function ProductPage() {
         transition={{ duration: 0.4 }}
         className="grid items-start gap-6 md:grid-cols-2 lg:gap-10"
       >
-        <ProductGallery images={product.images} />
+        <div className="lg:sticky lg:top-24 lg:self-start">
+          <ProductGallery images={product.images} />
+        </div>
 
         <div className="rounded-xl border border-gold-500/15 bg-white p-5 shadow-sm sm:p-6">
           <div className="flex flex-wrap items-center gap-2">
