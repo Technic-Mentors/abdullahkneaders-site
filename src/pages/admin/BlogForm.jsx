@@ -13,6 +13,7 @@ import {
 import { useAsync } from '../../hooks/useAsync';
 import Input from '../../components/ui/Input';
 import Select from '../../components/ui/Select';
+import { getErrorMessage } from '../../utils/errorMessage';
 import Textarea from '../../components/ui/Textarea';
 import Button from '../../components/ui/Button';
 import Spinner from '../../components/ui/Spinner';
@@ -91,7 +92,7 @@ export default function BlogForm() {
       setNewCategoryName('');
       refetchCategories();
     } catch (err) {
-      toast.error(err.response?.data?.error || 'Something went wrong');
+      toast.error(getErrorMessage(err, 'Something went wrong'));
     } finally {
       setCreatingCategory(false);
     }
@@ -123,7 +124,7 @@ export default function BlogForm() {
         navigate(`/admin/blog/${created.id}/edit`, { replace: true });
       }
     } catch (err) {
-      toast.error(err.response?.data?.error || 'Something went wrong');
+      toast.error(getErrorMessage(err, 'Something went wrong'));
     } finally {
       setSubmitting(false);
     }
@@ -135,7 +136,7 @@ export default function BlogForm() {
       toast.success('Featured image uploaded.');
       refetchPost();
     } catch (err) {
-      toast.error(err.response?.data?.error || 'Something went wrong');
+      toast.error(getErrorMessage(err, 'Something went wrong'));
     }
   }
 

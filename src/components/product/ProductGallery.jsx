@@ -1,9 +1,9 @@
-import { useState } from 'react';
+import { forwardRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { cn } from '../../utils/cn';
 import { assetUrl } from '../../utils/media';
 
-export default function ProductGallery({ images = [] }) {
+const ProductGallery = forwardRef(function ProductGallery({ images = [] }, ref) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [zooming, setZooming] = useState(false);
   const [zoomOrigin, setZoomOrigin] = useState('50% 50%');
@@ -23,6 +23,7 @@ export default function ProductGallery({ images = [] }) {
   return (
     <div>
       <div
+        ref={ref}
         className="group relative aspect-square w-full cursor-zoom-in overflow-hidden rounded-xl bg-stone-100 ring-1 ring-gold-500/15"
         onMouseEnter={() => setZooming(true)}
         onMouseLeave={() => setZooming(false)}
@@ -88,7 +89,9 @@ export default function ProductGallery({ images = [] }) {
       )}
     </div>
   );
-}
+});
+
+export default ProductGallery;
 
 function ChevronIcon({ direction = 'right' }) {
   return (

@@ -13,6 +13,7 @@ import Select from '../../components/ui/Select';
 import SearchableSelect from '../../components/ui/SearchableSelect';
 import Modal from '../../components/ui/Modal';
 import ConfirmDialog from '../../components/ui/ConfirmDialog';
+import { getErrorMessage } from '../../utils/errorMessage';
 import ErrorState from '../../components/ui/ErrorState';
 
 const emptyForm = {
@@ -98,7 +99,7 @@ export default function Coupons() {
       close();
       refetch();
     } catch (err) {
-      toast.error(err.response?.data?.error || 'Something went wrong');
+      toast.error(getErrorMessage(err, 'Something went wrong'));
     } finally {
       setSubmitting(false);
     }
@@ -112,7 +113,7 @@ export default function Coupons() {
       setDeleteTarget(null);
       refetch();
     } catch (err) {
-      toast.error(err.response?.data?.error || 'Something went wrong');
+      toast.error(getErrorMessage(err, 'Something went wrong'));
     } finally {
       setDeleting(false);
     }

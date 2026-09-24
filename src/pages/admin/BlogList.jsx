@@ -9,6 +9,7 @@ import Badge from '../../components/ui/Badge';
 import Button from '../../components/ui/Button';
 import ConfirmDialog from '../../components/ui/ConfirmDialog';
 import ErrorState from '../../components/ui/ErrorState';
+import { getErrorMessage } from '../../utils/errorMessage';
 
 export default function BlogList() {
   const navigate = useNavigate();
@@ -28,7 +29,7 @@ export default function BlogList() {
       setDeleteTarget(null);
       refetch();
     } catch (err) {
-      toast.error(err.response?.data?.error || 'Something went wrong');
+      toast.error(getErrorMessage(err, 'Something went wrong'));
     } finally {
       setDeleting(false);
     }

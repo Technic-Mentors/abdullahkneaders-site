@@ -8,6 +8,7 @@ import Input from '../ui/Input';
 import Textarea from '../ui/Textarea';
 import Button from '../ui/Button';
 import { submitReview } from '../../api/reviews.api';
+import { getErrorMessage } from '../../utils/errorMessage';
 
 const schema = z.object({
   rating: z.number().min(1, 'Please select a rating').max(5),
@@ -31,7 +32,7 @@ export default function ReviewForm({ orderItemId, onSubmitted }) {
       toast.success('Review submitted for approval.');
       onSubmitted?.();
     } catch (err) {
-      toast.error(err.response?.data?.error || 'Could not submit review.');
+      toast.error(getErrorMessage(err, 'Could not submit review.'));
     } finally {
       setLoading(false);
     }

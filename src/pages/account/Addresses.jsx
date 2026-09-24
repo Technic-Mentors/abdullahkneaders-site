@@ -6,6 +6,7 @@ import { useAsync } from '../../hooks/useAsync';
 import { useDisclosure } from '../../hooks/useDisclosure';
 import { getAddresses, createAddress, updateAddress, deleteAddress, setDefaultAddress } from '../../api/addresses.api';
 import { addressSchema } from '../../validation/address.schema';
+import { getErrorMessage } from '../../utils/errorMessage';
 import Modal from '../../components/ui/Modal';
 import ConfirmDialog from '../../components/ui/ConfirmDialog';
 import Button from '../../components/ui/Button';
@@ -53,7 +54,7 @@ export default function Addresses() {
       close();
       refetch();
     } catch (err) {
-      toast.error(err.response?.data?.error || 'Could not save address.');
+      toast.error(getErrorMessage(err, 'Could not save address.'));
     } finally {
       setSaving(false);
     }

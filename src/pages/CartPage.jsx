@@ -1,14 +1,17 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { AnimatePresence, motion } from 'framer-motion';
 import toast from 'react-hot-toast';
 import { useCartStore, cartSubtotal } from '../store/useCartStore';
 import CartLineItem from '../components/cart/CartLineItem';
+import CheckoutNudge from '../components/cart/CheckoutNudge';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
 import EmptyState from '../components/ui/EmptyState';
 import { formatCurrency } from '../utils/format';
 import { previewCoupon } from '../api/coupons.api';
 import { useAuthStore } from '../store/useAuthStore';
+import { getErrorMessage } from '../utils/errorMessage';
 
 export default function CartPage() {
   const items = useCartStore((s) => s.items);
@@ -17,6 +20,12 @@ export default function CartPage() {
   const [couponCode, setCouponCode] = useState('');
   const [discount, setDiscount] = useState(null);
   const [checkingCoupon, setCheckingCoupon] = useState(false);
+  const [proceeding, setProceeding] = useState(false);
+  const proceedTimeoutRef = useRef(null);
+
+  useEffect(() => {
+    return () => clearTimeout(proceedTimeoutRef.current);
+  }, []);
 
   const subtotal = cartSubtotal(items);
   const itemCount = items.reduce((sum, i) => sum + i.quantity, 0);
@@ -31,14 +40,18 @@ export default function CartPage() {
       toast.success(`Coupon applied: -${formatCurrency(result.discountAmount)}`);
     } catch (err) {
       setDiscount(null);
-      toast.error(err.response?.data?.error || 'Invalid coupon.');
+      toast.error(getErrorMessage(err, 'Invalid coupon.'));
     } finally {
       setCheckingCoupon(false);
     }
   }
 
   function goToCheckout() {
-    navigate('/checkout', { state: { couponCode: discount ? couponCode : undefined } });
+    if (proceeding) return;
+    setProceeding(true);
+    proceedTimeoutRef.current = setTimeout(() => {
+      navigate('/checkout', { state: { couponCode: discount ? couponCode : undefined } });
+    }, 550);
   }
 
   if (items.length === 0) {
@@ -70,10 +83,11 @@ export default function CartPage() {
       </h1>
 
       <div className="grid gap-6 lg:grid-cols-[1fr_340px]">
-        <div className="rounded-lg border border-stone-200 bg-white px-5">
+        <div className="rounded-lg border border-stone-200 bg-white px-5 pb-5">
           {items.map((item) => (
             <CartLineItem key={item.variantId} item={item} />
           ))}
+          <CheckoutNudge />
         </div>
 
         <div className="h-fit space-y-5 rounded-lg border border-stone-200 bg-white p-6 shadow-sm">
@@ -113,8 +127,44 @@ export default function CartPage() {
             <span>{formatCurrency(subtotal - (discount?.discountAmount || 0))}</span>
           </div>
 
-          <Button onClick={goToCheckout} variant="gold" className="w-full" size="lg">
-            Proceed to Checkout
+          <Button
+            onClick={goToCheckout}
+            variant="gold"
+            className="w-full overflow-hidden"
+            size="lg"
+            disabled={proceeding}
+          >
+            <AnimatePresence mode="wait" initial={false}>
+              {proceeding ? (
+                <motion.span
+                  key="proceeding"
+                  initial={{ opacity: 0, x: 16 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -16 }}
+                  transition={{ duration: 0.2 }}
+                  className="flex items-center gap-2"
+                >
+                  <motion.span
+                    initial={{ x: -28, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    transition={{ type: 'spring', stiffness: 350, damping: 18 }}
+                  >
+                    <CheckoutCartIcon />
+                  </motion.span>
+                  Heading to Checkout...
+                </motion.span>
+              ) : (
+                <motion.span
+                  key="default"
+                  initial={{ opacity: 0, x: 16 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -16 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  Proceed to Checkout
+                </motion.span>
+              )}
+            </AnimatePresence>
           </Button>
 
           <div className="flex items-center justify-center gap-2 pt-2 text-xs text-charcoal-light">
@@ -123,6 +173,16 @@ export default function CartPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+function CheckoutCartIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+      <circle cx="9" cy="21" r="1" />
+      <circle cx="19" cy="21" r="1" />
+      <path d="M2.5 2.5h2l2.6 12.5a2 2 0 0 0 2 1.6h8a2 2 0 0 0 2-1.5l1.5-7H6" />
+    </svg>
   );
 }
 

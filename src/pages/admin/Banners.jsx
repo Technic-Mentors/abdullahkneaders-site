@@ -13,6 +13,7 @@ import ConfirmDialog from '../../components/ui/ConfirmDialog';
 import ErrorState from '../../components/ui/ErrorState';
 import Spinner from '../../components/ui/Spinner';
 import EmptyState from '../../components/ui/EmptyState';
+import { getErrorMessage } from '../../utils/errorMessage';
 import Pagination from '../../components/ui/Pagination';
 import { assetUrl } from '../../utils/media';
 
@@ -102,7 +103,7 @@ export default function Banners() {
       close();
       refetch();
     } catch (err) {
-      toast.error(err.response?.data?.error || 'Something went wrong');
+      toast.error(getErrorMessage(err, 'Something went wrong'));
     } finally {
       setSubmitting(false);
     }
@@ -116,7 +117,7 @@ export default function Banners() {
       setDeleteTarget(null);
       refetch();
     } catch (err) {
-      toast.error(err.response?.data?.error || 'Something went wrong');
+      toast.error(getErrorMessage(err, 'Something went wrong'));
     } finally {
       setDeleting(false);
     }

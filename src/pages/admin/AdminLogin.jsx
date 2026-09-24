@@ -8,6 +8,7 @@ import { useAdminAuthStore } from '../../store/useAdminAuthStore';
 import Input from '../../components/ui/Input';
 import Button from '../../components/ui/Button';
 import Spinner from '../../components/ui/Spinner';
+import { getErrorMessage } from '../../utils/errorMessage';
 
 const schema = z.object({
   email: z.string().min(1, 'Email is required').email('Enter a valid email'),
@@ -39,7 +40,7 @@ export default function AdminLogin() {
       await login(values.email, values.password);
       navigate('/admin', { replace: true });
     } catch (err) {
-      toast.error(err.response?.data?.error || 'Something went wrong');
+      toast.error(getErrorMessage(err, 'Something went wrong'));
     } finally {
       setSubmitting(false);
     }

@@ -10,6 +10,7 @@ import Modal from '../../components/ui/Modal';
 import Textarea from '../../components/ui/Textarea';
 import ErrorState from '../../components/ui/ErrorState';
 import Spinner from '../../components/ui/Spinner';
+import { getErrorMessage } from '../../utils/errorMessage';
 
 const NEXT_STATUSES = {
   placed: ['confirmed', 'cancelled'],
@@ -51,7 +52,7 @@ export default function OrderDetail() {
       setNote('');
       refetch();
     } catch (err) {
-      toast.error(err.response?.data?.error || 'Something went wrong');
+      toast.error(getErrorMessage(err, 'Something went wrong'));
     } finally {
       setSubmitting(false);
     }

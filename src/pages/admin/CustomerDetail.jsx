@@ -10,6 +10,7 @@ import Button from '../../components/ui/Button';
 import ConfirmDialog from '../../components/ui/ConfirmDialog';
 import ErrorState from '../../components/ui/ErrorState';
 import Spinner from '../../components/ui/Spinner';
+import { getErrorMessage } from '../../utils/errorMessage';
 
 export default function CustomerDetail() {
   const { id } = useParams();
@@ -40,7 +41,7 @@ export default function CustomerDetail() {
       setConfirmingBlock(false);
       refetch();
     } catch (err) {
-      toast.error(err.response?.data?.error || 'Something went wrong');
+      toast.error(getErrorMessage(err, 'Something went wrong'));
     } finally {
       setSubmitting(false);
     }
@@ -53,7 +54,7 @@ export default function CustomerDetail() {
       toast.success('Customer unblocked.');
       refetch();
     } catch (err) {
-      toast.error(err.response?.data?.error || 'Something went wrong');
+      toast.error(getErrorMessage(err, 'Something went wrong'));
     } finally {
       setSubmitting(false);
     }

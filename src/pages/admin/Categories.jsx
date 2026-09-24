@@ -11,6 +11,7 @@ import { useAsync } from '../../hooks/useAsync';
 import { useDisclosure } from '../../hooks/useDisclosure';
 import DataTable from '../../components/admin/table/DataTable';
 import ImageUploader from '../../components/admin/form/ImageUploader';
+import { getErrorMessage } from '../../utils/errorMessage';
 import Badge from '../../components/ui/Badge';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
@@ -85,7 +86,7 @@ export default function Categories() {
       close();
       refetch();
     } catch (err) {
-      toast.error(err.response?.data?.error || 'Something went wrong');
+      toast.error(getErrorMessage(err, 'Something went wrong'));
     } finally {
       setSubmitting(false);
     }
@@ -99,7 +100,7 @@ export default function Categories() {
       setDeleteTarget(null);
       refetch();
     } catch (err) {
-      const message = err.response?.data?.error || 'Something went wrong';
+      const message = getErrorMessage(err, 'Something went wrong');
       toast.error(
         err.response?.status === 409
           ? `${message} This category still has products or subcategories.`
@@ -116,7 +117,7 @@ export default function Categories() {
       toast.success('Banner uploaded.');
       refetch();
     } catch (err) {
-      toast.error(err.response?.data?.error || 'Something went wrong');
+      toast.error(getErrorMessage(err, 'Something went wrong'));
     }
   }
 

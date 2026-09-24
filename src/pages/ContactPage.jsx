@@ -13,6 +13,7 @@ import {
 import { useAsync } from '../hooks/useAsync';
 import { getPublicSettings } from '../api/settings.api';
 import { submitContactMessage } from '../api/contact.api';
+import { getErrorMessage } from '../utils/errorMessage';
 import Input from '../components/ui/Input';
 import Textarea from '../components/ui/Textarea';
 import Button from '../components/ui/Button';
@@ -110,7 +111,7 @@ export default function ContactPage() {
       setForm({ name: '', email: '', message: '' });
       setSent(true);
     } catch (err) {
-      toast.error(err.response?.data?.error || 'Could not send your message. Please try again.');
+      toast.error(getErrorMessage(err, 'Could not send your message. Please try again.'));
     } finally {
       setSending(false);
     }

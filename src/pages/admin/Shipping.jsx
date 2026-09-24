@@ -13,6 +13,7 @@ import DataTable from '../../components/admin/table/DataTable';
 import Badge from '../../components/ui/Badge';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
+import { getErrorMessage } from '../../utils/errorMessage';
 import Modal from '../../components/ui/Modal';
 import ConfirmDialog from '../../components/ui/ConfirmDialog';
 import ErrorState from '../../components/ui/ErrorState';
@@ -66,7 +67,7 @@ export default function Shipping() {
       toast.success('Shipping settings updated.');
       refetch();
     } catch (err) {
-      toast.error(err.response?.data?.error || 'Something went wrong');
+      toast.error(getErrorMessage(err, 'Something went wrong'));
     } finally {
       setSavingSettings(false);
     }
@@ -107,7 +108,7 @@ export default function Shipping() {
       close();
       refetch();
     } catch (err) {
-      toast.error(err.response?.data?.error || 'Something went wrong');
+      toast.error(getErrorMessage(err, 'Something went wrong'));
     } finally {
       setSubmittingZone(false);
     }
@@ -121,7 +122,7 @@ export default function Shipping() {
       setDeleteTarget(null);
       refetch();
     } catch (err) {
-      toast.error(err.response?.data?.error || 'Something went wrong');
+      toast.error(getErrorMessage(err, 'Something went wrong'));
     } finally {
       setDeleting(false);
     }

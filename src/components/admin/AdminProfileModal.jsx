@@ -7,6 +7,7 @@ import Input from '../ui/Input';
 import Button from '../ui/Button';
 import ImageUploader from './form/ImageUploader';
 import { assetUrl } from '../../utils/media';
+import { getErrorMessage } from '../../utils/errorMessage';
 
 const emptyPasswordForm = { currentPassword: '', newPassword: '', confirmPassword: '' };
 
@@ -35,7 +36,7 @@ export default function AdminProfileModal({ open, onClose }) {
       await uploadAvatar(file);
       toast.success('Avatar updated.');
     } catch (err) {
-      toast.error(err.response?.data?.error || 'Something went wrong');
+      toast.error(getErrorMessage(err, 'Something went wrong'));
     } finally {
       setUploadingAvatar(false);
     }
@@ -59,7 +60,7 @@ export default function AdminProfileModal({ open, onClose }) {
       await updateProfile(profileForm.name, profileForm.email);
       toast.success('Profile updated.');
     } catch (err) {
-      toast.error(err.response?.data?.error || 'Something went wrong');
+      toast.error(getErrorMessage(err, 'Something went wrong'));
     } finally {
       setSavingProfile(false);
     }
@@ -81,7 +82,7 @@ export default function AdminProfileModal({ open, onClose }) {
       toast.success('Password updated.');
       setPasswordForm(emptyPasswordForm);
     } catch (err) {
-      toast.error(err.response?.data?.error || 'Something went wrong');
+      toast.error(getErrorMessage(err, 'Something went wrong'));
     } finally {
       setSavingPassword(false);
     }

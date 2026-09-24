@@ -1,34 +1,46 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import toast from 'react-hot-toast';
 import { useAsync } from '../hooks/useAsync';
 import { getProductBySlug, getProducts } from '../api/catalog.api';
 import { getProductReviews } from '../api/reviews.api';
-import { addToWishlist, removeFromWishlist, getWishlist } from '../api/wishlist.api';
 import { notifyMe } from '../api/notifyMe.api';
 import { useCartStore } from '../store/useCartStore';
 import { useAuthStore } from '../store/useAuthStore';
+import { useRecentlyViewedStore } from '../store/useRecentlyViewedStore';
+import { useFlyToStore } from '../store/useFlyToStore';
+import { useWishlistStore } from '../store/useWishlistStore';
+import { getIconTargetRect } from '../utils/iconTargets';
+import { assetUrl } from '../utils/media';
+import { getErrorMessage } from '../utils/errorMessage';
 import ProductGallery from '../components/product/ProductGallery';
 import VariantSelector from '../components/product/VariantSelector';
 import ReviewList from '../components/product/ReviewList';
 import ProductCard from '../components/product/ProductCard';
+import RecentlyViewed from '../components/product/RecentlyViewed';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
 import Spinner from '../components/ui/Spinner';
 import ErrorState from '../components/ui/ErrorState';
 import { TruckIcon, ReturnIcon, BadgeIcon, LockIcon } from '../components/icons/TrustIcons';
 import { formatCurrency } from '../utils/format';
+import { BRAND_NAME } from '../config/site.js';
 
 export default function ProductPage() {
   const { slug } = useParams();
   const customer = useAuthStore((s) => s.customer);
   const addItem = useCartStore((s) => s.addItem);
   const cartItems = useCartStore((s) => s.items);
+  const addRecentlyViewed = useRecentlyViewedStore((s) => s.addProduct);
+  const launchFlyTo = useFlyToStore((s) => s.launch);
+  const { has: hasWishlisted, toggle: toggleWishlist, load: loadWishlist, loaded: wishlistLoaded } = useWishlistStore();
+  const galleryRef = useRef(null);
+  const justAddedTimeoutRef = useRef(null);
   const [selectedVariant, setSelectedVariant] = useState(null);
   const [quantity, setQuantity] = useState(1);
+  const [justAdded, setJustAdded] = useState(false);
   const [notifyEmail, setNotifyEmail] = useState('');
-  const [isWishlisted, setIsWishlisted] = useState(false);
 
   const { data: product, loading, error, refetch } = useAsync(() => getProductBySlug(slug), [slug]);
   const { data: reviewData } = useAsync(
@@ -41,14 +53,31 @@ export default function ProductPage() {
   );
 
   useEffect(() => {
-    if (customer && product) {
-      getWishlist().then((list) => setIsWishlisted(list.some((p) => p.id === product.id)));
-    }
-  }, [customer, product]);
+    if (customer && !wishlistLoaded) loadWishlist();
+  }, [customer, wishlistLoaded, loadWishlist]);
+
+  const isWishlisted = product ? hasWishlisted(product.id) : false;
 
   useEffect(() => {
     setQuantity(1);
   }, [selectedVariant?.id]);
+
+  useEffect(() => {
+    return () => clearTimeout(justAddedTimeoutRef.current);
+  }, []);
+
+  useEffect(() => {
+    if (!product) return;
+    addRecentlyViewed({
+      id: product.id,
+      slug: product.slug,
+      name: product.name,
+      base_price: product.base_price,
+      compare_at_price: product.compare_at_price,
+      primary_image: product.images?.[0]?.image_path,
+      total_stock: (product.variants || []).reduce((sum, v) => sum + v.stock_quantity, 0),
+    });
+  }, [product, addRecentlyViewed]);
 
   if (loading) {
     return (
@@ -76,6 +105,12 @@ export default function ProductPage() {
   async function handleAddToCart() {
     if (!selectedVariant || remainingStock <= 0) return;
     try {
+      const fromRect = galleryRef.current?.getBoundingClientRect();
+      const toRect = getIconTargetRect('cart');
+      const imagePath = product.images?.[0]?.image_path;
+      if (fromRect && toRect && imagePath) {
+        launchFlyTo({ imageUrl: assetUrl(imagePath), fromRect, toRect, target: 'cart' });
+      }
       await addItem(
         {
           variantId: selectedVariant.id,
@@ -91,20 +126,34 @@ export default function ProductPage() {
         quantity,
       );
       toast.success('Added to cart');
+      setJustAdded(true);
+      clearTimeout(justAddedTimeoutRef.current);
+      justAddedTimeoutRef.current = setTimeout(() => setJustAdded(false), 1400);
     } catch (err) {
-      toast.error(err.response?.data?.error || 'Could not add to cart.');
+      toast.error(getErrorMessage(err, 'Could not add to cart.'));
     }
   }
 
   async function handleWishlistToggle() {
     if (!customer) return toast.error('Please log in to use your wishlist.');
-    if (isWishlisted) {
-      await removeFromWishlist(product.id);
-      setIsWishlisted(false);
-    } else {
-      await addToWishlist(product.id);
-      setIsWishlisted(true);
+    try {
+      if (!isWishlisted) {
+        const fromRect = galleryRef.current?.getBoundingClientRect();
+        const toRect = getIconTargetRect('wishlist');
+        const imagePath = product.images?.[0]?.image_path;
+        if (fromRect && toRect && imagePath) {
+          launchFlyTo({ imageUrl: assetUrl(imagePath), fromRect, toRect, target: 'wishlist' });
+        }
+      }
+      await toggleWishlist(product);
+    } catch {
+      toast.error('Something went wrong.');
     }
+  }
+
+  function handleShareOnWhatsApp() {
+    const message = `Check out ${product.name} on ${BRAND_NAME}: ${window.location.href}`;
+    window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank', 'noopener,noreferrer');
   }
 
   async function handleNotifyMe(e) {
@@ -115,7 +164,7 @@ export default function ProductPage() {
       toast.success("We'll email you when it's back in stock.");
       setNotifyEmail('');
     } catch (err) {
-      toast.error(err.response?.data?.error || 'Something went wrong.');
+      toast.error(getErrorMessage(err, 'Something went wrong.'));
     }
   }
 
@@ -136,13 +185,21 @@ export default function ProductPage() {
         className="grid items-start gap-6 md:grid-cols-2 lg:gap-10"
       >
         <div className="lg:sticky lg:top-24 lg:self-start">
-          <ProductGallery images={product.images} />
+          <ProductGallery ref={galleryRef} images={product.images} />
         </div>
 
         <div className="rounded-xl border border-gold-500/15 bg-white p-5 shadow-sm sm:p-6">
           <div className="flex flex-wrap items-center gap-2">
             <span className="text-xs font-semibold uppercase tracking-[0.2em] text-gold-600">{product.category_name}</span>
             <StockBadge allOutOfStock={allOutOfStock} variant={selectedVariant} />
+            <button
+              type="button"
+              onClick={handleShareOnWhatsApp}
+              aria-label="Share this product on WhatsApp"
+              className="ml-auto flex h-8 w-8 items-center justify-center rounded-full text-emerald-600 transition-colors hover:bg-emerald-50"
+            >
+              <WhatsAppShareIcon />
+            </button>
           </div>
           <h1 className="mt-2 font-serif text-3xl leading-tight text-charcoal sm:text-[2rem]">{product.name}</h1>
           <div className="mt-3 flex flex-wrap items-baseline gap-x-3 gap-y-1">
@@ -207,17 +264,56 @@ export default function ProductPage() {
                   <Button
                     onClick={handleAddToCart}
                     disabled={!selectedVariant || remainingStock <= 0}
-                    className="flex-1"
+                    className="flex-1 overflow-hidden"
                   >
-                    Add to Cart
+                    <AnimatePresence mode="wait" initial={false}>
+                      {justAdded ? (
+                        <motion.span
+                          key="added"
+                          initial={{ opacity: 0, x: 16 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          exit={{ opacity: 0, x: -16 }}
+                          transition={{ duration: 0.2 }}
+                          className="flex items-center gap-2"
+                        >
+                          <motion.span
+                            initial={{ x: -28, opacity: 0 }}
+                            animate={{ x: 0, opacity: 1 }}
+                            transition={{ type: 'spring', stiffness: 350, damping: 18 }}
+                          >
+                            <MiniCartIcon />
+                          </motion.span>
+                          Added to Cart
+                        </motion.span>
+                      ) : (
+                        <motion.span
+                          key="default"
+                          initial={{ opacity: 0, x: 16 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          exit={{ opacity: 0, x: -16 }}
+                          transition={{ duration: 0.2 }}
+                        >
+                          Add to Cart
+                        </motion.span>
+                      )}
+                    </AnimatePresence>
                   </Button>
                   <Button
                     variant="outline"
                     onClick={handleWishlistToggle}
                     aria-pressed={isWishlisted}
-                    className="shrink-0"
+                    className="shrink-0 overflow-hidden"
                   >
-                    {isWishlisted ? '♥ Saved' : '♡ Wishlist'}
+                    <motion.span
+                      key={isWishlisted}
+                      initial={{ scale: 0.5 }}
+                      animate={{ scale: 1 }}
+                      transition={{ type: 'spring', stiffness: 500, damping: 15 }}
+                      className="inline-flex items-center gap-1.5"
+                    >
+                      <span>{isWishlisted ? '♥' : '♡'}</span>
+                      {isWishlisted ? 'Saved' : 'Wishlist'}
+                    </motion.span>
                   </Button>
                 </div>
               </div>
@@ -299,6 +395,8 @@ export default function ProductPage() {
           </div>
         </motion.div>
       )}
+
+      <RecentlyViewed excludeId={product.id} />
     </div>
   );
 }
@@ -350,6 +448,24 @@ function MaterialIcon() {
     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="text-gold-600">
       <path d="m12 2 9 5-9 5-9-5 9-5Z" />
       <path d="m3 12 9 5 9-5M3 17l9 5 9-5" />
+    </svg>
+  );
+}
+
+function MiniCartIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+      <circle cx="9" cy="21" r="1" />
+      <circle cx="19" cy="21" r="1" />
+      <path d="M2.5 2.5h2l2.6 12.5a2 2 0 0 0 2 1.6h8a2 2 0 0 0 2-1.5l1.5-7H6" />
+    </svg>
+  );
+}
+
+function WhatsAppShareIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 32 32" fill="currentColor">
+      <path d="M16.001 3C9.376 3 4 8.376 4 15c0 2.378.694 4.59 1.885 6.45L4 29l7.76-1.832A11.94 11.94 0 0 0 16 27c6.624 0 12-5.376 12-12S22.625 3 16.001 3zm0 21.75a9.68 9.68 0 0 1-4.94-1.352l-.354-.21-4.605 1.087 1.115-4.486-.23-.368A9.7 9.7 0 0 1 6.25 15c0-5.376 4.375-9.75 9.75-9.75 5.376 0 9.75 4.374 9.75 9.75 0 5.376-4.374 9.75-9.75 9.75zm5.35-7.296c-.294-.147-1.737-.857-2.006-.954-.27-.098-.466-.147-.662.147-.196.294-.759.954-.93 1.15-.173.196-.343.22-.637.074-.294-.147-1.243-.458-2.367-1.46-.875-.78-1.465-1.744-1.637-2.038-.172-.294-.018-.453.128-.6.13-.13.294-.343.44-.515.147-.171.196-.294.294-.49.098-.196.049-.368-.024-.515-.074-.147-.662-1.598-.908-2.188-.238-.574-.48-.497-.662-.506l-.564-.01c-.196 0-.514.073-.784.367-.27.294-1.029 1.006-1.029 2.452s1.054 2.844 1.2 3.04c.147.196 2.073 3.166 5.023 4.44.702.302 1.25.482 1.677.617.705.223 1.347.191 1.855.116.566-.084 1.737-.71 1.983-1.396.245-.687.245-1.276.172-1.396-.074-.122-.27-.196-.564-.343z" />
     </svg>
   );
 }

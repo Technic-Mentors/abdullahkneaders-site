@@ -7,6 +7,7 @@ import Textarea from '../../components/ui/Textarea';
 import Button from '../../components/ui/Button';
 import ErrorState from '../../components/ui/ErrorState';
 import Spinner from '../../components/ui/Spinner';
+import { getErrorMessage } from '../../utils/errorMessage';
 
 const emptyForm = {
   store_name: '',
@@ -72,7 +73,7 @@ export default function Settings() {
       toast.success('Settings updated.');
       refetch();
     } catch (err) {
-      toast.error(err.response?.data?.error || 'Something went wrong');
+      toast.error(getErrorMessage(err, 'Something went wrong'));
     } finally {
       setSubmitting(false);
     }

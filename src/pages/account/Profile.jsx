@@ -9,6 +9,7 @@ import { useCartStore } from '../../store/useCartStore';
 import { useWishlistStore } from '../../store/useWishlistStore';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
+import { getErrorMessage } from '../../utils/errorMessage';
 
 const profileSchema = z.object({
   name: z
@@ -53,7 +54,7 @@ export default function Profile() {
       toast.success('Profile updated.');
       setEditing(false);
     } catch (err) {
-      toast.error(err.response?.data?.error || 'Could not update profile.');
+      toast.error(getErrorMessage(err, 'Could not update profile.'));
     } finally {
       setSaving(false);
     }

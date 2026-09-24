@@ -4,6 +4,7 @@ import { useAuthStore } from '../../store/useAuthStore';
 import { useCartStore } from '../../store/useCartStore';
 import Header from './Header';
 import Footer from './Footer';
+import FlyToLayer from './FlyToLayer';
 
 export default function PublicLayout() {
   const status = useAuthStore((s) => s.status);
@@ -41,6 +42,7 @@ export default function PublicLayout() {
         <Outlet />
       </main>
       {!isAccountPortal && <Footer />}
+      <FlyToLayer />
     </div>
   );
 }

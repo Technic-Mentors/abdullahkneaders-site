@@ -8,6 +8,7 @@ import { useAuthStore } from '../store/useAuthStore';
 import { useCartStore } from '../store/useCartStore';
 import Input from '../components/ui/Input';
 import Button from '../components/ui/Button';
+import { getErrorMessage } from '../utils/errorMessage';
 
 const schema = z.object({
   email: z.string().email('Enter a valid email'),
@@ -32,7 +33,7 @@ export default function LoginPage() {
       await useCartStore.getState().mergeGuestCartIntoServer();
       navigate(location.state?.from || '/account');
     } catch (err) {
-      toast.error(err.response?.data?.error || 'Login failed.');
+      toast.error(getErrorMessage(err, 'Login failed.'));
     } finally {
       setLoading(false);
     }

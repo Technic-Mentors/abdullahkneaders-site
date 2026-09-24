@@ -13,6 +13,7 @@ import Input from '../../components/ui/Input';
 import Textarea from '../../components/ui/Textarea';
 import StarRating from '../../components/ui/Stars';
 import Modal from '../../components/ui/Modal';
+import { getErrorMessage } from '../../utils/errorMessage';
 import ConfirmDialog from '../../components/ui/ConfirmDialog';
 import ErrorState from '../../components/ui/ErrorState';
 
@@ -74,7 +75,7 @@ export default function Reviews() {
       setFormErrors({});
       refetch();
     } catch (err) {
-      toast.error(err.response?.data?.error || 'Something went wrong');
+      toast.error(getErrorMessage(err, 'Something went wrong'));
     } finally {
       setAdding(false);
     }
@@ -86,7 +87,7 @@ export default function Reviews() {
       toast.success('Review approved.');
       refetch();
     } catch (err) {
-      toast.error(err.response?.data?.error || 'Something went wrong');
+      toast.error(getErrorMessage(err, 'Something went wrong'));
     }
   }
 
@@ -96,7 +97,7 @@ export default function Reviews() {
       toast.success('Review rejected.');
       refetch();
     } catch (err) {
-      toast.error(err.response?.data?.error || 'Something went wrong');
+      toast.error(getErrorMessage(err, 'Something went wrong'));
     }
   }
 
@@ -108,7 +109,7 @@ export default function Reviews() {
       setDeleteTarget(null);
       refetch();
     } catch (err) {
-      toast.error(err.response?.data?.error || 'Something went wrong');
+      toast.error(getErrorMessage(err, 'Something went wrong'));
     } finally {
       setSubmitting(false);
     }

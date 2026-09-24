@@ -13,6 +13,7 @@ import {
   deleteProductImage,
   setPrimaryImage,
 } from '../../api/admin/products.api';
+import { getErrorMessage } from '../../utils/errorMessage';
 import { listCategories } from '../../api/admin/categories.api';
 import { useAsync } from '../../hooks/useAsync';
 import Input from '../../components/ui/Input';
@@ -170,7 +171,7 @@ export default function ProductForm() {
         navigate(`/admin/products/${created.id}/edit`, { replace: true });
       }
     } catch (err) {
-      toast.error(err.response?.data?.error || 'Something went wrong');
+      toast.error(getErrorMessage(err, 'Something went wrong'));
     } finally {
       setSubmitting(false);
     }
@@ -182,7 +183,7 @@ export default function ProductForm() {
       toast.success('Image uploaded.');
       refetchProduct();
     } catch (err) {
-      toast.error(err.response?.data?.error || 'Something went wrong');
+      toast.error(getErrorMessage(err, 'Something went wrong'));
     }
   }
 
@@ -192,7 +193,7 @@ export default function ProductForm() {
       toast.success('Image removed.');
       refetchProduct();
     } catch (err) {
-      toast.error(err.response?.data?.error || 'Something went wrong');
+      toast.error(getErrorMessage(err, 'Something went wrong'));
     }
   }
 
@@ -202,7 +203,7 @@ export default function ProductForm() {
       toast.success('Primary image updated.');
       refetchProduct();
     } catch (err) {
-      toast.error(err.response?.data?.error || 'Something went wrong');
+      toast.error(getErrorMessage(err, 'Something went wrong'));
     }
   }
 

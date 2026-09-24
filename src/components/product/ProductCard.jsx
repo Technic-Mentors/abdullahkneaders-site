@@ -1,10 +1,12 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
 import { formatCurrency } from '../../utils/format';
 import { useAuthStore } from '../../store/useAuthStore';
 import { useWishlistStore } from '../../store/useWishlistStore';
+import { useFlyToStore } from '../../store/useFlyToStore';
+import { getIconTargetRect } from '../../utils/iconTargets';
 import { assetUrl } from '../../utils/media';
 import Stars from '../ui/Stars';
 
@@ -14,6 +16,8 @@ export default function ProductCard({ product, onToggleWishlist, isWishlisted: i
   const navigate = useNavigate();
   const customer = useAuthStore((s) => s.customer);
   const { has, toggle, load, loaded } = useWishlistStore();
+  const launchFlyTo = useFlyToStore((s) => s.launch);
+  const imageRef = useRef(null);
 
   useEffect(() => {
     if (customer && !loaded && !onToggleWishlist) load();
@@ -37,6 +41,13 @@ export default function ProductCard({ product, onToggleWishlist, isWishlisted: i
       return;
     }
     try {
+      if (!isWishlisted && product.primary_image) {
+        const fromRect = imageRef.current?.getBoundingClientRect();
+        const toRect = getIconTargetRect('wishlist');
+        if (fromRect && toRect) {
+          launchFlyTo({ imageUrl: assetUrl(product.primary_image), fromRect, toRect, target: 'wishlist' });
+        }
+      }
       await toggle(product);
     } catch {
       toast.error('Something went wrong.');
@@ -60,6 +71,7 @@ export default function ProductCard({ product, onToggleWishlist, isWishlisted: i
         <div className="relative aspect-4/5 overflow-hidden rounded-lg bg-stone-100 shadow-sm ring-1 ring-gold-500/20 transition-all duration-300 group-hover:shadow-md group-hover:ring-gold-500/50">
           {product.primary_image ? (
             <img
+              ref={imageRef}
               src={assetUrl(product.primary_image)}
               alt={product.name}
               className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
@@ -89,7 +101,15 @@ export default function ProductCard({ product, onToggleWishlist, isWishlisted: i
               aria-label="Toggle wishlist"
               className="flex h-7 w-7 items-center justify-center rounded-full bg-white/95 text-charcoal shadow-sm transition-colors hover:text-gold-600"
             >
-              <HeartIcon filled={isWishlisted} />
+              <motion.span
+                key={isWishlisted}
+                initial={{ scale: 0.5 }}
+                animate={{ scale: 1 }}
+                transition={{ type: 'spring', stiffness: 500, damping: 15 }}
+                className="flex"
+              >
+                <HeartIcon filled={isWishlisted} />
+              </motion.span>
             </button>
             {!outOfStock && (
               <button

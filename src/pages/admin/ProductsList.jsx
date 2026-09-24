@@ -13,6 +13,7 @@ import Input from '../../components/ui/Input';
 import SearchableSelect from '../../components/ui/SearchableSelect';
 import ConfirmDialog from '../../components/ui/ConfirmDialog';
 import ErrorState from '../../components/ui/ErrorState';
+import { getErrorMessage } from '../../utils/errorMessage';
 import { assetUrl } from '../../utils/media';
 
 export default function ProductsList() {
@@ -47,7 +48,7 @@ export default function ProductsList() {
       setDeleteTarget(null);
       refetch();
     } catch (err) {
-      const message = err.response?.data?.error || 'Something went wrong';
+      const message = getErrorMessage(err, 'Something went wrong');
       toast.error(
         err.response?.status === 409
           ? `${message} This product cannot be deleted because it has existing orders. Try marking it inactive instead.`

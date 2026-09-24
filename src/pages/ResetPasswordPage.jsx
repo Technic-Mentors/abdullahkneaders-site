@@ -5,6 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import toast from 'react-hot-toast';
 import { resetPassword } from '../api/auth.api';
+import { getErrorMessage } from '../utils/errorMessage';
 import Input from '../components/ui/Input';
 import Button from '../components/ui/Button';
 
@@ -35,7 +36,7 @@ export default function ResetPasswordPage() {
       toast.success('Password reset. Please log in.');
       navigate('/login');
     } catch (err) {
-      toast.error(err.response?.data?.error || 'Reset link invalid or expired.');
+      toast.error(getErrorMessage(err, 'Reset link invalid or expired.'));
     } finally {
       setLoading(false);
     }

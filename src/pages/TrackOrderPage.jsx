@@ -5,6 +5,7 @@ import Input from '../components/ui/Input';
 import Button from '../components/ui/Button';
 import Badge from '../components/ui/Badge';
 import { formatCurrency, formatDateTime } from '../utils/format';
+import { getErrorMessage } from '../utils/errorMessage';
 
 const STATUS_STEPS = ['placed', 'confirmed', 'packed', 'shipped', 'delivered'];
 
@@ -35,7 +36,7 @@ export default function TrackOrderPage() {
       const result = await trackOrder(orderNumber, phone);
       setOrder(result);
     } catch (err) {
-      setError(err.response?.data?.error || 'No order found for that order number and phone number.');
+      setError(getErrorMessage(err, 'No order found for that order number and phone number.'));
     } finally {
       setLoading(false);
     }

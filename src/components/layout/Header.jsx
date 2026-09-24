@@ -4,9 +4,11 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useAuthStore } from '../../store/useAuthStore';
 import { useCartStore, cartItemCount } from '../../store/useCartStore';
 import { useWishlistStore } from '../../store/useWishlistStore';
+import { useFlyToStore } from '../../store/useFlyToStore';
 import { useAsync } from '../../hooks/useAsync';
 import { getCategories } from '../../api/catalog.api';
 import { cn } from '../../utils/cn';
+import { registerIconTarget } from '../../utils/iconTargets';
 import CustomerNotificationBell from './CustomerNotificationBell';
 import SearchBar from './SearchBar';
 
@@ -29,8 +31,10 @@ const Header = React.forwardRef(function Header(_, ref) {
   const customer = useAuthStore((s) => s.customer);
   const items = useCartStore((s) => s.items);
   const count = cartItemCount(items);
+  const cartBump = useFlyToStore((s) => s.bumps.cart);
   const wishlistCount = useWishlistStore((s) => s.productIds.size);
   const wishlistLoaded = useWishlistStore((s) => s.loaded);
+  const wishlistBump = useFlyToStore((s) => s.bumps.wishlist);
 
   const { data: categories } = useAsync(() => getCategories(), []);
   const topCategories = (categories || []).filter((c) => !c.parent_id);
@@ -168,9 +172,18 @@ const Header = React.forwardRef(function Header(_, ref) {
                 <Link
                   to={customer ? '/account/wishlist' : '/login'}
                   aria-label="Wishlist"
+                  ref={(el) => registerIconTarget('wishlist', el)}
                   className="relative flex h-[19px] w-[19px] items-center justify-center text-charcoal-light hover:text-gold-600"
                 >
-                  <HeartIcon />
+                  <motion.span
+                    key={wishlistBump}
+                    initial={{ scale: 1 }}
+                    animate={{ scale: [1, 1.35, 1] }}
+                    transition={{ duration: 0.4, ease: 'easeOut' }}
+                    className="flex h-full w-full items-center justify-center"
+                  >
+                    <HeartIcon />
+                  </motion.span>
 
                   {wishlistCount > 0 && (
                     <span className="absolute -right-2 -top-2 flex h-4.5 w-4.5 items-center justify-center rounded-full bg-gold-500 text-[10px] font-semibold text-white">
@@ -190,9 +203,18 @@ const Header = React.forwardRef(function Header(_, ref) {
                 <Link
                   to="/cart"
                   aria-label="Cart"
+                  ref={(el) => registerIconTarget('cart', el)}
                   className="relative flex h-[19px] w-[19px] items-center justify-center text-charcoal-light hover:text-gold-600"
                 >
-                  <CartIcon />
+                  <motion.span
+                    key={cartBump}
+                    initial={{ scale: 1 }}
+                    animate={{ scale: [1, 1.35, 1] }}
+                    transition={{ duration: 0.4, ease: 'easeOut' }}
+                    className="flex h-full w-full items-center justify-center"
+                  >
+                    <CartIcon />
+                  </motion.span>
 
                   {count > 0 && (
                     <span className="absolute -right-2 -top-2 flex h-4.5 w-4.5 items-center justify-center rounded-full bg-gold-500 text-[10px] font-semibold text-white">

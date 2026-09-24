@@ -9,10 +9,13 @@ import { checkout } from '../api/orders.api';
 import { getPublicSettings } from '../api/settings.api';
 import { addressSchema } from '../validation/address.schema';
 import { useCartStore, cartSubtotal } from '../store/useCartStore';
+import PaymentMethodAnimation from '../components/checkout/PaymentMethodAnimation';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
 import Spinner from '../components/ui/Spinner';
 import { formatCurrency } from '../utils/format';
+import { assetUrl } from '../utils/media';
+import { getErrorMessage } from '../utils/errorMessage';
 
 export default function CheckoutPage() {
   const location = useLocation();
@@ -35,6 +38,7 @@ export default function CheckoutPage() {
 
   const subtotal = cartSubtotal(items);
   const couponCode = location.state?.couponCode;
+  const productImage = items[0]?.primaryImage ? assetUrl(items[0].primaryImage) : null;
 
   function selectDefault(list) {
     if (!selectedAddressId && list?.length) {
@@ -58,7 +62,7 @@ export default function CheckoutPage() {
       toast.success('Order placed successfully!');
       navigate(`/order-confirmation/${order.id}`);
     } catch (err) {
-      toast.error(err.response?.data?.error || 'Could not place order.');
+      toast.error(getErrorMessage(err, 'Could not place order.'));
     } finally {
       setPlacing(false);
     }
@@ -124,6 +128,8 @@ export default function CheckoutPage() {
               )}
             </div>
           )}
+
+          <PaymentMethodAnimation method={paymentMethod} productImage={productImage} />
         </div>
 
         <div className="h-fit space-y-3 rounded-md bg-stone-50 p-5">

@@ -12,6 +12,7 @@ import ConfirmDialog from '../../components/ui/ConfirmDialog';
 import Modal from '../../components/ui/Modal';
 import ReviewForm from '../../components/product/ReviewForm';
 import { formatCurrency, formatDateTime } from '../../utils/format';
+import { getErrorMessage } from '../../utils/errorMessage';
 
 const STATUS_STEPS = ['placed', 'confirmed', 'packed', 'shipped', 'delivered'];
 
@@ -44,7 +45,7 @@ export default function OrderDetail() {
       toast.success('Order cancelled.');
       refetch();
     } catch (err) {
-      toast.error(err.response?.data?.error || 'Could not cancel order.');
+      toast.error(getErrorMessage(err, 'Could not cancel order.'));
     } finally {
       setCancelling(false);
       setConfirmOpen(false);
