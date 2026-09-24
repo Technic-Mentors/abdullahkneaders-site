@@ -58,17 +58,18 @@ export const useCartStore = create(
         }
 
         set((state) => {
+          const stock = variantSnapshot.stockQuantity ?? Infinity;
           const existing = state.items.find((item) => item.variantId === variantSnapshot.variantId);
           if (existing) {
             return {
               items: state.items.map((item) =>
                 item.variantId === variantSnapshot.variantId
-                  ? { ...item, quantity: item.quantity + quantity }
+                  ? { ...item, ...variantSnapshot, quantity: Math.min(item.quantity + quantity, stock) }
                   : item,
               ),
             };
           }
-          return { items: [...state.items, { ...variantSnapshot, quantity }] };
+          return { items: [...state.items, { ...variantSnapshot, quantity: Math.min(quantity, stock) }] };
         });
       },
 

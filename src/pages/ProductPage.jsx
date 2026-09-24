@@ -24,6 +24,7 @@ export default function ProductPage() {
   const { slug } = useParams();
   const customer = useAuthStore((s) => s.customer);
   const addItem = useCartStore((s) => s.addItem);
+  const cartItems = useCartStore((s) => s.items);
   const [selectedVariant, setSelectedVariant] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [notifyEmail, setNotifyEmail] = useState('');
@@ -45,6 +46,10 @@ export default function ProductPage() {
     }
   }, [customer, product]);
 
+  useEffect(() => {
+    setQuantity(1);
+  }, [selectedVariant?.id]);
+
   if (loading) {
     return (
       <div className="flex min-h-[50vh] items-center justify-center">
@@ -63,23 +68,32 @@ export default function ProductPage() {
       ? Math.round((1 - Number(price) / Number(product.compare_at_price)) * 100)
       : 0;
 
+  const alreadyInCart = selectedVariant
+    ? cartItems.find((item) => item.variantId === selectedVariant.id)?.quantity ?? 0
+    : 0;
+  const remainingStock = selectedVariant ? Math.max(0, selectedVariant.stock_quantity - alreadyInCart) : 0;
+
   async function handleAddToCart() {
-    if (!selectedVariant) return;
-    await addItem(
-      {
-        variantId: selectedVariant.id,
-        productId: product.id,
-        productName: product.name,
-        productSlug: product.slug,
-        size: selectedVariant.size,
-        color: selectedVariant.color,
-        unitPrice: Number(selectedVariant.price_override ?? product.base_price),
-        primaryImage: product.images?.[0]?.image_path,
-        stockQuantity: selectedVariant.stock_quantity,
-      },
-      quantity,
-    );
-    toast.success('Added to cart');
+    if (!selectedVariant || remainingStock <= 0) return;
+    try {
+      await addItem(
+        {
+          variantId: selectedVariant.id,
+          productId: product.id,
+          productName: product.name,
+          productSlug: product.slug,
+          size: selectedVariant.size,
+          color: selectedVariant.color,
+          unitPrice: Number(selectedVariant.price_override ?? product.base_price),
+          primaryImage: product.images?.[0]?.image_path,
+          stockQuantity: selectedVariant.stock_quantity,
+        },
+        quantity,
+      );
+      toast.success('Added to cart');
+    } catch (err) {
+      toast.error(err.response?.data?.error || 'Could not add to cart.');
+    }
   }
 
   async function handleWishlistToggle() {
@@ -167,41 +181,51 @@ export default function ProductPage() {
               </div>
             </form>
           ) : (
-            <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
-              <div className="flex w-fit items-center gap-1 rounded-full border border-gold-500/30 px-1">
-                <button
-                  aria-label="Decrease quantity"
-                  onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                  className="flex h-9 w-9 items-center justify-center rounded-full text-charcoal-light transition-colors hover:bg-gold-50 hover:text-gold-700"
-                >
-                  −
-                </button>
-                <span className="min-w-[1.5rem] text-center text-sm font-medium text-charcoal">{quantity}</span>
-                <button
-                  aria-label="Increase quantity"
-                  onClick={() => setQuantity((q) => Math.min(selectedVariant?.stock_quantity ?? 1, q + 1))}
-                  className="flex h-9 w-9 items-center justify-center rounded-full text-charcoal-light transition-colors hover:bg-gold-50 hover:text-gold-700"
-                >
-                  +
-                </button>
+            <div className="mt-6 flex flex-col gap-2">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                <div className="flex w-fit items-center gap-1 rounded-full border border-gold-500/30 px-1">
+                  <button
+                    aria-label="Decrease quantity"
+                    onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                    className="flex h-9 w-9 items-center justify-center rounded-full text-charcoal-light transition-colors hover:bg-gold-50 hover:text-gold-700"
+                  >
+                    −
+                  </button>
+                  <span className="min-w-[1.5rem] text-center text-sm font-medium text-charcoal">{quantity}</span>
+                  <button
+                    aria-label="Increase quantity"
+                    onClick={() => setQuantity((q) => Math.min(remainingStock, q + 1))}
+                    disabled={quantity >= remainingStock}
+                    className="flex h-9 w-9 items-center justify-center rounded-full text-charcoal-light transition-colors hover:bg-gold-50 hover:text-gold-700 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent"
+                  >
+                    +
+                  </button>
+                </div>
+                <div className="flex flex-1 gap-2">
+                  <Button
+                    onClick={handleAddToCart}
+                    disabled={!selectedVariant || remainingStock <= 0}
+                    className="flex-1"
+                  >
+                    Add to Cart
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={handleWishlistToggle}
+                    aria-pressed={isWishlisted}
+                    className="shrink-0"
+                  >
+                    {isWishlisted ? '♥ Saved' : '♡ Wishlist'}
+                  </Button>
+                </div>
               </div>
-              <div className="flex flex-1 gap-2">
-                <Button
-                  onClick={handleAddToCart}
-                  disabled={!selectedVariant || selectedVariant.stock_quantity === 0}
-                  className="flex-1"
-                >
-                  Add to Cart
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={handleWishlistToggle}
-                  aria-pressed={isWishlisted}
-                  className="shrink-0"
-                >
-                  {isWishlisted ? '♥ Saved' : '♡ Wishlist'}
-                </Button>
-              </div>
+              {selectedVariant && remainingStock <= 0 ? (
+                <p className="text-xs font-medium text-amber-700">
+                  You already have all {selectedVariant.stock_quantity} in stock in your cart.
+                </p>
+              ) : alreadyInCart > 0 ? (
+                <p className="text-xs text-charcoal-light">{alreadyInCart} already in your cart.</p>
+              ) : null}
             </div>
           )}
 
