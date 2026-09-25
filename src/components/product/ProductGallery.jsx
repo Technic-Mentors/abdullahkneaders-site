@@ -10,7 +10,7 @@ const ProductGallery = forwardRef(function ProductGallery({ images = [] }, ref) 
   const active = images[activeIndex];
 
   if (images.length === 0) {
-    return <div className="aspect-square w-full rounded-md bg-stone-100" />;
+    return <div className="aspect-square w-full rounded-md bg-white" />;
   }
 
   function handleMouseMove(e) {
@@ -24,7 +24,7 @@ const ProductGallery = forwardRef(function ProductGallery({ images = [] }, ref) 
     <div>
       <div
         ref={ref}
-        className="group relative aspect-square w-full cursor-zoom-in overflow-hidden rounded-xl bg-stone-100 ring-1 ring-gold-500/15"
+        className="group relative aspect-square w-full cursor-zoom-in overflow-hidden rounded-xl bg-white ring-1 ring-gold-500/15"
         onMouseEnter={() => setZooming(true)}
         onMouseLeave={() => setZooming(false)}
         onMouseMove={handleMouseMove}
@@ -78,7 +78,7 @@ const ProductGallery = forwardRef(function ProductGallery({ images = [] }, ref) 
               aria-label={`View image ${i + 1}`}
               onClick={() => setActiveIndex(i)}
               className={cn(
-                'h-16 w-16 shrink-0 overflow-hidden rounded-md border-2 bg-stone-100 transition-colors',
+                'h-16 w-16 shrink-0 overflow-hidden rounded-md border-2 bg-white transition-colors',
                 i === activeIndex ? 'border-gold-500' : 'border-transparent hover:border-gold-500/40',
               )}
             >

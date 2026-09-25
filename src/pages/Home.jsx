@@ -649,7 +649,7 @@ function Categories({ categories }) {
             <Reveal key={cat.slug} variant="scale" delay={i * 0.08}>
               <TiltCard>
                 <Link
-                  to={`/category/${cat.slug}`}
+                  to={`/onlineshop?category=${cat.slug}`}
                   className={`group relative block aspect-[16/10] overflow-hidden rounded-2xl bg-charcoal ${FOCUS}`}
                 >
                   {cat.banner_image ? (
@@ -1635,7 +1635,7 @@ export default function Home() {
   }, [slides.length, activeSlide]);
 
   const topCategories = (categories || []).filter((c) => !c.parent_id);
-  const firstCategoryLink = topCategories[0] ? `/category/${topCategories[0].slug}` : '/';
+  const firstCategoryLink = topCategories[0] ? `/onlineshop?category=${topCategories[0].slug}` : '/onlineshop';
 
   return (
     <MotionConfig reducedMotion="user">

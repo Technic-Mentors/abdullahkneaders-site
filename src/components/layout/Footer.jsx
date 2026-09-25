@@ -1,15 +1,8 @@
 import { Link } from 'react-router-dom';
-import { TruckIcon, ReturnIcon, BadgeIcon, LockIcon } from '../icons/TrustIcons';
 import { useAsync } from '../../hooks/useAsync';
 import { getCategories } from '../../api/catalog.api';
 import { getPublicSettings } from '../../api/settings.api';
-
-const TRUST_POINTS = [
-  { icon: TruckIcon, label: 'Cash on Delivery', description: 'Pay when it arrives' },
-  { icon: ReturnIcon, label: 'Easy Returns', description: 'Hassle-free returns' },
-  { icon: BadgeIcon, label: 'Quality Assured', description: 'Every piece checked' },
-  { icon: LockIcon, label: 'Secure Checkout', description: 'Your details stay safe' },
-];
+import { STORE_MAP_EMBED_URL } from '../../config/mapLocation';
 
 const PHONE_DISPLAY = '+92 310 7777899';
 const WHATSAPP_NUMBER = '923107777899';
@@ -48,28 +41,14 @@ export default function Footer() {
               <img
                 src="/logo.png"
                 alt="Abdullah Kneaders"
-                className="h-20 w-30 transition-transform duration-300 group-hover:scale-105"
+                className="h-20 w-44 transition-transform duration-300 group-hover:scale-105"
               />
-              <div>
-
-              </div>
             </Link>
 
             <p className="text-xs leading-relaxed text-charcoal-light">
               Crafting efficient, reliable dough makers since 1958 — perfect atta, maida, and qeema dough
               every time, with Cash on Delivery available across Pakistan.
             </p>
-
-            {/* Social icons */}
-            <div className="mt-3 flex items-center gap-1.5">
-              <SocialLink
-                href={`https://wa.me/${WHATSAPP_NUMBER}`}
-                label="WhatsApp"
-                icon={<WhatsAppIcon />}
-              />
-              <SocialLink href={FACEBOOK_URL} label="Facebook" icon={<FacebookIcon />} />
-              <SocialLink href={INSTAGRAM_URL} label="Instagram" icon={<InstagramIcon />} />
-            </div>
           </div>
 
           {/* ── Shop links ── */}
@@ -79,22 +58,20 @@ export default function Footer() {
               Shop
             </h4>
             <ul className="space-y-1 text-sm">
+              <FooterLink to="/onlineshop">All Products</FooterLink>
               {topCategories.map((category) => (
-                <FooterLink key={category.id} to={`/category/${category.slug}`}>
+                <FooterLink key={category.id} to={`/onlineshop?category=${category.slug}`}>
                   {category.name}
                 </FooterLink>
               ))}
-              <FooterLink to="/benefits">Benefits</FooterLink>
-              <FooterLink to="/offers">Special Offers</FooterLink>
-              <FooterLink to="/blog">Guides &amp; Journal</FooterLink>
             </ul>
           </div>
 
-          {/* ── Help + Contact ── */}
+          {/* ── Useful Links ── */}
           <div>
             <h4 className="mb-2 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-gold-500">
               <span className="h-px w-3 bg-gold-500" />
-              Help
+              Useful Links
             </h4>
             <ul className="space-y-1 text-sm">
               <FooterLink to="/track-order">Track Order</FooterLink>
@@ -104,42 +81,61 @@ export default function Footer() {
               <FooterLink to="/about">About Us</FooterLink>
               <FooterLink to="/contact">Contact Us</FooterLink>
             </ul>
+          </div>
 
-            {/* Contact block */}
-            <div className="mt-2 space-y-1 border-t border-gold-500/15 pt-2">
+          {/* ── Reach Us ── */}
+          <div>
+            <h4 className="mb-2 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-gold-500">
+              <span className="h-px w-3 bg-gold-500" />
+              Reach Us
+            </h4>
+
+            <div className="space-y-1.5">
               <p className="flex items-start gap-1.5 text-[11px] text-charcoal-light">
                 <PinIconSmall />
                 <span>{settings?.store_address || 'Gondlanwala Rd, Gobandgarh, Gujranwala, 52250'}</span>
               </p>
               <a
-                href={`tel:${PHONE_DISPLAY.replace(/\s+/g, '')}`}
+                href={`tel:${(settings?.store_phone || PHONE_DISPLAY).replace(/\s+/g, '')}`}
                 className="flex items-center gap-1.5 text-[11px] text-charcoal-light transition-colors hover:text-gold-600"
               >
                 <PhoneIconSmall />
-                <span>{PHONE_DISPLAY}</span>
+                <span>{settings?.store_phone || PHONE_DISPLAY}</span>
               </a>
+              {settings?.store_email && (
+                <a
+                  href={`mailto:${settings.store_email}`}
+                  className="flex items-center gap-1.5 text-[11px] text-charcoal-light transition-colors hover:text-gold-600"
+                >
+                  <MailIconSmall />
+                  <span>{settings.store_email}</span>
+                </a>
+              )}
             </div>
-          </div>
 
-          {/* ── Why shop with us ── */}
-          <div>
-            <h4 className="mb-2 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-gold-500">
-              <span className="h-px w-3 bg-gold-500" />
-              Why Shop With Us
-            </h4>
-            <ul className="space-y-1.5">
-              {TRUST_POINTS.map(({ icon: Icon, label, description }) => (
-                <li key={label} className="flex items-start gap-2.5">
-                  <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-gold-500/25 bg-gold-500/5 text-gold-600">
-                    <Icon />
-                  </span>
-                  <span>
-                    <p className="text-xs font-medium text-charcoal">{label}</p>
-                    <p className="text-[11px] text-charcoal-light">{description}</p>
-                  </span>
-                </li>
-              ))}
-            </ul>
+            {/* Small embedded map */}
+            <div className="mt-2.5 overflow-hidden rounded-md border border-gold-500/15">
+              <iframe
+                title="Store location"
+                src={STORE_MAP_EMBED_URL}
+                width="100%"
+                height="110"
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                className="block w-full"
+              />
+            </div>
+
+            {/* Social icons */}
+            <div className="mt-2.5 flex items-center gap-1.5">
+              <SocialLink
+                href={`https://wa.me/${WHATSAPP_NUMBER}`}
+                label="WhatsApp"
+                icon={<WhatsAppIcon />}
+              />
+              <SocialLink href={FACEBOOK_URL} label="Facebook" icon={<FacebookIcon />} />
+              <SocialLink href={INSTAGRAM_URL} label="Instagram" icon={<InstagramIcon />} />
+            </div>
           </div>
         </div>
       </div>
@@ -253,6 +249,15 @@ function PhoneIconSmall() {
   return (
     <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0">
       <path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3.1-8.7A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .3 2 .6 2.9a2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.2-1.2a2 2 0 0 1 2.1-.5c.9.3 1.9.5 2.9.6a2 2 0 0 1 1.8 2Z" />
+    </svg>
+  );
+}
+
+function MailIconSmall() {
+  return (
+    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0">
+      <rect x="2" y="4" width="20" height="16" rx="2" />
+      <path d="m2 7 10 6 10-6" />
     </svg>
   );
 }

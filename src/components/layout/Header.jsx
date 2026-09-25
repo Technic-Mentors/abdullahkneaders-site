@@ -128,6 +128,13 @@ const Header = React.forwardRef(function Header(_, ref) {
                 Home
               </NavLink>
 
+              <NavLink
+                to="/onlineshop"
+                className={({ isActive }) => navLinkClass(isActive)}
+              >
+                Shop
+              </NavLink>
+
               <CategoriesDropdown
                 topCategories={topCategories}
                 subcategoriesOf={subcategoriesOf}
@@ -261,10 +268,18 @@ const Header = React.forwardRef(function Header(_, ref) {
                 Home
               </NavLink>
 
+              <NavLink
+                to="/onlineshop"
+                onClick={() => setMobileMenuOpen(false)}
+                className={({ isActive }) => navLinkClass(isActive)}
+              >
+                Shop
+              </NavLink>
+
               {topCategories.map((cat) => (
                 <NavLink
                   key={cat.id}
-                  to={`/category/${cat.slug}`}
+                  to={`/onlineshop?category=${cat.slug}`}
                   onClick={() => setMobileMenuOpen(false)}
                   className={({ isActive }) => navLinkClass(isActive)}
                 >
@@ -418,7 +433,7 @@ function CategoriesDropdown({ topCategories, subcategoriesOf }) {
                         className="bg-white px-4 py-5"
                       >
                         <Link
-                          to={`/category/${cat.slug}`}
+                          to={`/onlineshop?category=${cat.slug}`}
                           onClick={() => setOpen(false)}
                           className="group mb-3 flex items-center gap-2.5 border-b border-stone-100 pb-3 font-serif text-[15px] text-charcoal hover:text-gold-600"
                         >
@@ -433,7 +448,7 @@ function CategoriesDropdown({ topCategories, subcategoriesOf }) {
                             {subs.map((sub) => (
                               <li key={sub.id}>
                                 <Link
-                                  to={`/category/${sub.slug}`}
+                                  to={`/onlineshop?category=${sub.slug}`}
                                   onClick={() => setOpen(false)}
                                   className="block rounded-md px-2 py-1.5 text-[13px] text-charcoal-light transition-colors hover:bg-gold-50/60 hover:text-gold-700"
                                 >
@@ -449,7 +464,7 @@ function CategoriesDropdown({ topCategories, subcategoriesOf }) {
                         )}
 
                         <Link
-                          to={`/category/${cat.slug}`}
+                          to={`/onlineshop?category=${cat.slug}`}
                           onClick={() => setOpen(false)}
                           className="mt-3 inline-block text-[12px] font-medium text-gold-600 hover:text-gold-700"
                         >

@@ -4,7 +4,10 @@ import { useAuthStore } from '../../store/useAuthStore';
 import { useCartStore } from '../../store/useCartStore';
 import Header from './Header';
 import Footer from './Footer';
+import WhyShopWithUs from './WhyShopWithUs';
 import FlyToLayer from './FlyToLayer';
+
+const HIDE_WHY_SHOP_WITH_US_ON = ['/login', '/register', '/track-order'];
 
 export default function PublicLayout() {
   const status = useAuthStore((s) => s.status);
@@ -12,6 +15,7 @@ export default function PublicLayout() {
   const fetchMe = useAuthStore((s) => s.fetchMe);
   const location = useLocation();
   const isAccountPortal = location.pathname.startsWith('/account');
+  const hideWhyShopWithUs = HIDE_WHY_SHOP_WITH_US_ON.includes(location.pathname);
   const headerRef = useRef(null);
   const [headerHeight, setHeaderHeight] = useState(0);
 
@@ -41,6 +45,7 @@ export default function PublicLayout() {
       <main className="flex-1">
         <Outlet />
       </main>
+      {!hideWhyShopWithUs && <WhyShopWithUs />}
       {!isAccountPortal && <Footer />}
       <FlyToLayer />
     </div>

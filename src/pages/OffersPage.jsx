@@ -189,7 +189,7 @@ export default function OffersPage() {
             </p>
 
             <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-              <Link to="/">
+              <Link to="/onlineshop">
                 <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.96 }}>
                   <Button variant="gold" size="lg">Shop Now</Button>
                 </motion.div>

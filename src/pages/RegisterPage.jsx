@@ -2,28 +2,13 @@ import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
 import toast from 'react-hot-toast';
 import { useAuthStore } from '../store/useAuthStore';
 import { useCartStore } from '../store/useCartStore';
+import { registerSchema } from '../validation/auth.schema';
 import Input from '../components/ui/Input';
 import Button from '../components/ui/Button';
 import { getErrorMessage } from '../utils/errorMessage';
-
-const schema = z.object({
-  name: z
-    .string()
-    .trim()
-    .min(2, 'Name is too short')
-    .max(25, 'Name must be 25 characters or fewer')
-    .regex(/^[A-Za-z ]+$/, 'Name can only contain letters and spaces'),
-  email: z.string().email('Enter a valid email'),
-  phone: z
-    .string()
-    .trim()
-    .regex(/^\d{11}$/, 'Enter an 11-digit phone number'),
-  password: z.string().min(8, 'Password must be at least 8 characters'),
-});
 
 export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
@@ -34,7 +19,7 @@ export default function RegisterPage() {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm({ resolver: zodResolver(schema) });
+  } = useForm({ resolver: zodResolver(registerSchema) });
 
   async function onSubmit(values) {
     setLoading(true);
@@ -53,7 +38,7 @@ export default function RegisterPage() {
   return (
     <div className="mx-auto max-w-md px-4 py-16 sm:px-6">
       <div className="mb-8 text-center">
-        <img src="/logo.png" alt="MA Universal" className="mx-auto h-14 w-14" />
+        <img src="/logo.png" alt="Abdullah Kneaders" className="mx-auto h-20 w-auto" />
         <h1 className="mt-4 font-serif text-2xl text-charcoal">Create an Account</h1>
       </div>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">

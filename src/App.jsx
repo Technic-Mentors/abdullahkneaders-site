@@ -9,6 +9,7 @@ import ScrollToTop from './components/ScrollToTop';
 
 // Customer pages--there 
 const Home = lazy(() => import('./pages/Home'));
+const ShopPage = lazy(() => import('./pages/ShopPage'));
 const CategoryPage = lazy(() => import('./pages/CategoryPage'));
 const ProductPage = lazy(() => import('./pages/ProductPage'));
 const SearchPage = lazy(() => import('./pages/SearchPage'));
@@ -120,6 +121,7 @@ export default function App() {
         <Routes>
           <Route element={<PublicLayout />}>
             <Route index element={<Home />} />
+            <Route path="onlineshop" element={<ShopPage />} />
             <Route path="category/:slug" element={<CategoryPage />} />
             <Route path="product/:slug" element={<ProductPage />} />
             <Route path="search" element={<SearchPage />} />
@@ -139,9 +141,9 @@ export default function App() {
             <Route path="blog" element={<BlogListPage />} />
             <Route path="blog/:slug" element={<BlogPostPage />} />
             <Route path="track-order" element={<TrackOrderPage />} />
+            <Route path="checkout" element={<CheckoutPage />} />
 
             <Route element={<ProtectedRoute />}>
-              <Route path="checkout" element={<CheckoutPage />} />
               <Route path="order-confirmation/:id" element={<OrderConfirmationPage />} />
               <Route path="account" element={<AccountLayout />}>
                 <Route index element={<AccountOverview />} />

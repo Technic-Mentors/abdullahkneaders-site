@@ -348,7 +348,7 @@ export default function BenefitsPage() {
           </motion.p>
 
           <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-            <Link to="/">
+            <Link to="/onlineshop">
               <motion.div
                 initial={{ opacity: 0, y: 16 }}
                 whileInView={{ opacity: 1, y: 0 }}

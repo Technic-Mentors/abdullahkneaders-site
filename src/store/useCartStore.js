@@ -23,22 +23,39 @@ export const useCartStore = create(
     (set, get) => ({
       items: [],
       mode: 'guest', // 'guest' (localStorage) | 'server' (persisted cart_items table)
+      _syncPromise: null,
 
-      /** Call once after login/register succeeds, or on app load if already authenticated. */
-      async loadServerCart() {
-        const { data } = await shopApi.get('/cart');
-        set({ items: data.data.map(normalizeServerItem), mode: 'server' });
-      },
-
-      /** Call right after login/register — pushes the guest cart into the account, then reloads from server. */
-      async mergeGuestCartIntoServer() {
+      /**
+       * Merges any guest-mode items into the account (a no-op if already server-mode or empty)
+       * and reloads from the server. Concurrent callers share one in-flight sync instead of
+       * racing each other — important because both the login/register flow and the app's
+       * "customer became available" effect call into this independently on auth success.
+       */
+      async _syncWithServer() {
         const guestItems = get().mode === 'guest' ? get().items : [];
         if (guestItems.length > 0) {
           await shopApi.post('/cart/merge', {
             items: guestItems.map((item) => ({ variantId: item.variantId, quantity: item.quantity })),
           });
         }
-        await get().loadServerCart();
+        const { data } = await shopApi.get('/cart');
+        set({ items: data.data.map(normalizeServerItem), mode: 'server' });
+      },
+
+      /** Call once after login/register succeeds, or on app load if already authenticated. */
+      loadServerCart() {
+        if (!get()._syncPromise) {
+          const promise = get()
+            ._syncWithServer()
+            .finally(() => set({ _syncPromise: null }));
+          set({ _syncPromise: promise });
+        }
+        return get()._syncPromise;
+      },
+
+      /** Call right after login/register — pushes the guest cart into the account, then reloads from server. */
+      mergeGuestCartIntoServer() {
+        return get().loadServerCart();
       },
 
       /** Call on logout — drops the server-synced cart from local state, back to an empty guest cart. */

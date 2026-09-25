@@ -2,18 +2,13 @@ import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
 import toast from 'react-hot-toast';
 import { useAuthStore } from '../store/useAuthStore';
 import { useCartStore } from '../store/useCartStore';
+import { loginSchema } from '../validation/auth.schema';
 import Input from '../components/ui/Input';
 import Button from '../components/ui/Button';
 import { getErrorMessage } from '../utils/errorMessage';
-
-const schema = z.object({
-  email: z.string().email('Enter a valid email'),
-  password: z.string().min(1, 'Password is required'),
-});
 
 export default function LoginPage() {
   const [loading, setLoading] = useState(false);
@@ -24,7 +19,7 @@ export default function LoginPage() {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm({ resolver: zodResolver(schema) });
+  } = useForm({ resolver: zodResolver(loginSchema) });
 
   async function onSubmit(values) {
     setLoading(true);
@@ -42,7 +37,7 @@ export default function LoginPage() {
   return (
     <div className="mx-auto max-w-md px-4 py-16 sm:px-6">
       <div className="mb-8 text-center">
-        <img src="/logo.png" alt="MA Universal" className="mx-auto h-14 w-14" />
+        <img src="/logo.png" alt="Abdullah Kneaders" className="mx-auto h-20 w-auto" />
         <h1 className="mt-4 font-serif text-2xl text-charcoal">Welcome Back</h1>
       </div>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">

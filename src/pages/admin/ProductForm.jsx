@@ -65,6 +65,7 @@ export default function ProductForm() {
       fabric: '',
       basePrice: '',
       compareAtPrice: '',
+      sortOrder: 0,
       isFeatured: false,
       isActive: true,
       metaTitle: '',
@@ -85,6 +86,7 @@ export default function ProductForm() {
         fabric: product.fabric || '',
         basePrice: product.base_price ?? product.basePrice ?? '',
         compareAtPrice: product.compare_at_price ?? product.compareAtPrice ?? '',
+        sortOrder: product.sort_order ?? product.sortOrder ?? 0,
         isFeatured: Boolean(product.is_featured ?? product.isFeatured),
         isActive: Boolean(product.is_active ?? product.isActive ?? true),
         metaTitle: product.meta_title || product.metaTitle || '',
@@ -136,6 +138,7 @@ export default function ProductForm() {
         fabric: values.fabric || undefined,
         basePrice: Number(values.basePrice),
         compareAtPrice: values.compareAtPrice === '' ? undefined : Number(values.compareAtPrice),
+        sortOrder: values.sortOrder === '' ? 0 : Number(values.sortOrder),
         isFeatured: Boolean(values.isFeatured),
         metaTitle: values.metaTitle || undefined,
         metaDescription: values.metaDescription || undefined,
@@ -246,6 +249,13 @@ export default function ProductForm() {
               {...register('basePrice', { required: 'Base price is required', min: 0.01 })}
             />
             <Input label="Compare-at Price (Rs.)" type="number" step="0.01" min="0.01" {...register('compareAtPrice')} />
+            <Input
+              label="Sort Order (lower shows first)"
+              type="number"
+              step="1"
+              min="0"
+              {...register('sortOrder')}
+            />
             <div className="flex items-center gap-4 pt-6">
               <label className="flex items-center gap-2 text-sm text-charcoal">
                 <input type="checkbox" {...register('isFeatured')} className="h-4 w-4 rounded border-stone-300" />

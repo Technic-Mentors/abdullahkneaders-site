@@ -13,6 +13,7 @@ import {
 import { useAsync } from '../hooks/useAsync';
 import { getPublicSettings } from '../api/settings.api';
 import { submitContactMessage } from '../api/contact.api';
+import { STORE_MAP_PLACE_URL, STORE_MAP_EMBED_URL } from '../config/mapLocation';
 import { getErrorMessage } from '../utils/errorMessage';
 import Input from '../components/ui/Input';
 import Textarea from '../components/ui/Textarea';
@@ -329,7 +330,7 @@ export default function ContactPage() {
                 icon={<PinIcon />}
                 label="Address"
                 value={address}
-                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`}
+                href={STORE_MAP_PLACE_URL}
                 external
               />
               <ContactRow
@@ -353,7 +354,7 @@ export default function ContactPage() {
               <MapSkeleton />
               <iframe
                 title="Store location"
-                src={`https://www.google.com/maps?q=${encodeURIComponent(address)}&output=embed`}
+                src={STORE_MAP_EMBED_URL}
                 width="100%"
                 height="240"
                 loading="lazy"
@@ -629,7 +630,7 @@ export default function ContactPage() {
           </motion.p>
 
           <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-            <Link to="/">
+            <Link to="/onlineshop">
               <motion.div
                 initial={{ opacity: 0, y: 16 }}
                 whileInView={{ opacity: 1, y: 0 }}

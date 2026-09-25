@@ -173,7 +173,7 @@ export default function ProductPage() {
       <nav aria-label="Breadcrumb" className="mb-5 flex flex-wrap items-center gap-1.5 text-xs text-charcoal-light">
         <Link to="/" className="hover:text-gold-600">Home</Link>
         <span className="text-stone-300">/</span>
-        <Link to={`/category/${product.category_slug}`} className="hover:text-gold-600">{product.category_name}</Link>
+        <Link to={`/onlineshop?category=${product.category_slug}`} className="hover:text-gold-600">{product.category_name}</Link>
         <span className="text-stone-300">/</span>
         <span className="font-medium text-charcoal">{product.name}</span>
       </nav>
