@@ -7,7 +7,7 @@ import toast from 'react-hot-toast';
 import { useAsync } from '../hooks/useAsync';
 import { getAddresses } from '../api/addresses.api';
 import { checkout } from '../api/orders.api';
-import { getPublicSettings } from '../api/settings.api';
+import { getPublicSettings, getPublicShipping } from '../api/settings.api';
 import { addressSchema } from '../validation/address.schema';
 import { useAuthStore } from '../store/useAuthStore';
 import { useCartStore, cartSubtotal, cartItemCount } from '../store/useCartStore';
@@ -34,6 +34,7 @@ export default function CheckoutPage() {
   const [placing, setPlacing] = useState(false);
   const [orderPlaced, setOrderPlaced] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState('cod');
+  const [newAddressCity, setNewAddressCity] = useState('');
 
   useEffect(() => {
     if (authStatus === 'idle') fetchMe();
@@ -50,13 +51,11 @@ export default function CheckoutPage() {
     loading,
     refetch: refetchAddresses,
   } = useAsync(
-    // Reads live store state (not the closed-over `customer` var) so a stale `refetch` reference
-    // — e.g. one captured by AccountStep before `customer` existed — still fetches correctly
-    // once actually invoked, instead of silently resolving to nothing.
     () => (useAuthStore.getState().customer ? getAddresses() : Promise.resolve(null)),
     [customer],
   );
   const { data: settings } = useAsync(() => getPublicSettings(), []);
+  const { data: shippingConfig } = useAsync(() => getPublicShipping(), []);
   const {
     register,
     handleSubmit,
@@ -68,6 +67,28 @@ export default function CheckoutPage() {
   const couponCode = location.state?.couponCode;
   const productImage = items[0]?.primaryImage ? assetUrl(items[0].primaryImage) : null;
 
+  const selectedAddress = addresses?.find((a) => a.id === selectedAddressId);
+  const selectedCity = showNewAddress ? newAddressCity : selectedAddress?.city;
+
+  // Calculate shipping live from admin-configured settings + zones
+  const shippingCharges = (() => {
+    if (!shippingConfig) return 0;
+    const freeThreshold = Number(shippingConfig.freeShippingThreshold ?? 0);
+    if (freeThreshold > 0 && subtotal >= freeThreshold) return 0;
+
+    const defaultRate = Number(shippingConfig.defaultShippingRate ?? 0);
+    const zones = shippingConfig.zones || [];
+    if (selectedCity) {
+      const match = zones.find(
+        (z) => String(z.city).trim().toLowerCase() === String(selectedCity).trim().toLowerCase(),
+      );
+      if (match) return Number(match.charge ?? 0);
+    }
+    return defaultRate;
+  })();
+
+  const total = subtotal + shippingCharges;
+
   function selectDefault(list) {
     if (!selectedAddressId && list?.length) {
       setSelectedAddressId(list.find((a) => a.is_default)?.id || list[0].id);
@@ -78,7 +99,7 @@ export default function CheckoutPage() {
   async function placeOrder(newAddressData) {
     setPlacing(true);
     try {
-      const payload = { couponCode, paymentMethod };
+      const payload = { couponCode, paymentMethod, shippingCharges };
       if (selectedAddressId && !showNewAddress) {
         payload.addressId = selectedAddressId;
       } else {
@@ -134,7 +155,14 @@ export default function CheckoutPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
           >
-            <OrderSummaryPreview subtotal={subtotal} itemCount={itemCount} couponCode={couponCode} />
+            <OrderSummaryPreview
+              items={items}
+              subtotal={subtotal}
+              itemCount={itemCount}
+              couponCode={couponCode}
+              shippingCharges={shippingCharges}
+              total={total}
+            />
             <AccountNeededAnimation />
           </motion.div>
         </div>
@@ -149,6 +177,7 @@ export default function CheckoutPage() {
       <CheckoutSteps active={2} />
 
       <div className="grid gap-10 md:grid-cols-[1fr_320px]">
+        {/* LEFT COLUMN: Address + payment animation */}
         <div>
           <h2 className="mb-4 font-medium text-charcoal">Delivery Address</h2>
           {loading ? (
@@ -203,7 +232,12 @@ export default function CheckoutPage() {
                   <Input label="Phone" placeholder="03XXXXXXXXX" maxLength={11} {...register('phone')} error={errors.phone?.message} />
                   <Input label="Address Line 1" maxLength={100} {...register('addressLine1')} error={errors.addressLine1?.message} />
                   <Input label="Address Line 2 (optional)" maxLength={100} {...register('addressLine2')} error={errors.addressLine2?.message} />
-                  <Input label="City" {...register('city')} error={errors.city?.message} />
+                  <Input
+                    label="City"
+                    {...register('city')}
+                    error={errors.city?.message}
+                    onChange={(e) => setNewAddressCity(e.target.value)}
+                  />
                 </form>
               )}
             </div>
@@ -212,20 +246,40 @@ export default function CheckoutPage() {
           <PaymentMethodAnimation method={paymentMethod} productImage={productImage} />
         </div>
 
-        <div className="h-fit space-y-3 rounded-md bg-stone-50 p-5">
-          <div className="flex justify-between text-sm text-charcoal-light">
-            <span>Subtotal</span>
-            <span>{formatCurrency(subtotal)}</span>
+        {/* RIGHT COLUMN: Order details + payment + place order */}
+        <div className="h-fit overflow-hidden rounded-md border border-stone-200 bg-white">
+          <div className="border-b border-stone-200 bg-stone-50 px-5 py-3">
+            <h2 className="font-serif text-base text-charcoal">Order Details</h2>
           </div>
-          {couponCode && (
-            <div className="flex justify-between text-sm text-green-700">
-              <span>Coupon</span>
-              <span>{couponCode}</span>
-            </div>
-          )}
-          <p className="text-xs text-stone-400">Shipping charges will be confirmed on your order confirmation.</p>
 
-          <div className="space-y-2 border-t border-stone-200 pt-3">
+          <div className="p-5">
+            <OrderItemsList items={items} />
+
+            <div className="mt-4 space-y-1.5 border-t border-stone-200 pt-3 text-sm">
+              <div className="flex justify-between text-charcoal-light">
+                <span>{itemCount} item{itemCount === 1 ? '' : 's'}</span>
+                <span className="font-medium text-charcoal">{formatCurrency(subtotal)}</span>
+              </div>
+              <div className="flex justify-between text-charcoal-light">
+                <span>Shipping</span>
+                <span className="font-medium text-charcoal">
+                  {shippingCharges === 0 ? 'Free' : formatCurrency(shippingCharges)}
+                </span>
+              </div>
+              {couponCode && (
+                <div className="flex justify-between text-green-700">
+                  <span>Coupon</span>
+                  <span>{couponCode}</span>
+                </div>
+              )}
+              <div className="flex justify-between border-t border-stone-200 pt-2 text-charcoal">
+                <span className="font-medium">Total</span>
+                <span className="font-semibold">{formatCurrency(total)}</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-2 border-t border-stone-200 p-5">
             <p className="text-sm font-medium text-charcoal">Payment Method</p>
             <label className="flex cursor-pointer items-start gap-2 rounded-md border border-stone-200 bg-white p-3 text-sm has-checked:border-gold-400 has-checked:bg-gold-50">
               <input
@@ -287,15 +341,15 @@ export default function CheckoutPage() {
                 </p>
               </div>
             )}
-          </div>
 
-          <Button
-            className="w-full"
-            loading={placing}
-            onClick={showNewAddress ? handleSubmit(placeOrder) : () => placeOrder()}
-          >
-            Place Order
-          </Button>
+            <Button
+              className="mt-2 w-full"
+              loading={placing}
+              onClick={showNewAddress ? handleSubmit(placeOrder) : () => placeOrder()}
+            >
+              Place Order
+            </Button>
+          </div>
         </div>
       </div>
     </div>
@@ -355,24 +409,70 @@ function CheckIcon() {
   );
 }
 
+/* ═══════════════ Reusable Order Items List ═══════════════ */
+function OrderItemsList({ items }) {
+  return (
+    <div className="space-y-2.5">
+      {items.map((item) => (
+        <div key={item.variantId} className="flex items-start gap-3">
+          {item.primaryImage ? (
+            <img
+              src={assetUrl(item.primaryImage)}
+              alt=""
+              className="h-12 w-12 shrink-0 rounded-md border border-stone-200 bg-white object-contain p-1"
+            />
+          ) : (
+            <div className="h-12 w-12 shrink-0 rounded-md border border-stone-200 bg-white" />
+          )}
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-sm font-medium text-charcoal">{item.productName}</p>
+            <p className="text-xs text-charcoal-light">
+              {[item.size, item.color].filter(Boolean).join(' · ')}
+              {(item.size || item.color) && ' · '}
+              Qty {item.quantity}
+            </p>
+          </div>
+          <span className="shrink-0 text-sm font-medium text-charcoal">
+            {formatCurrency(item.unitPrice * item.quantity)}
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 /* ═══════════════ Order Summary Preview (Step 1) ═══════════════ */
-function OrderSummaryPreview({ subtotal, itemCount, couponCode }) {
+function OrderSummaryPreview({ items, subtotal, itemCount, couponCode, shippingCharges, total }) {
   return (
     <div className="h-fit space-y-3 rounded-md bg-stone-50 p-5">
       <h2 className="font-serif text-lg text-charcoal">Your Order</h2>
-      <div className="flex justify-between text-sm text-charcoal-light">
-        <span>{itemCount} item{itemCount === 1 ? '' : 's'}</span>
-        <span className="font-medium text-charcoal">{formatCurrency(subtotal)}</span>
+
+      <div className="border-b border-stone-200 pb-3">
+        <OrderItemsList items={items} />
       </div>
-      {couponCode && (
-        <div className="flex justify-between text-sm text-green-700">
-          <span>Coupon</span>
-          <span>{couponCode}</span>
+
+      <div className="space-y-1.5 text-sm">
+        <div className="flex justify-between text-charcoal-light">
+          <span>{itemCount} item{itemCount === 1 ? '' : 's'}</span>
+          <span className="font-medium text-charcoal">{formatCurrency(subtotal)}</span>
         </div>
-      )}
-      <p className="border-t border-stone-200 pt-3 text-xs text-stone-400">
-        Delivery address and payment method are next, right after your account.
-      </p>
+        <div className="flex justify-between text-charcoal-light">
+          <span>Shipping</span>
+          <span className="font-medium text-charcoal">
+            {shippingCharges === 0 ? 'Free' : formatCurrency(shippingCharges)}
+          </span>
+        </div>
+        {couponCode && (
+          <div className="flex justify-between text-green-700">
+            <span>Coupon</span>
+            <span>{couponCode}</span>
+          </div>
+        )}
+        <div className="flex justify-between border-t border-stone-200 pt-2 text-charcoal">
+          <span className="font-medium">Total</span>
+          <span className="font-semibold">{formatCurrency(total)}</span>
+        </div>
+      </div>
     </div>
   );
 }

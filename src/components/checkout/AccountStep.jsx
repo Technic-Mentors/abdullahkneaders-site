@@ -136,6 +136,18 @@ export default function AccountStep({ onAuthenticated }) {
               error={registerForm.formState.errors.email?.message}
             />
             <Input
+              label="Password"
+              type="password"
+              {...registerForm.register('password')}
+              error={registerForm.formState.errors.password?.message}
+            />
+            <Input
+              label="Confirm Password"
+              type="password"
+              {...registerForm.register('confirmPassword')}
+              error={registerForm.formState.errors.confirmPassword?.message}
+            />
+            <Input
               label="Phone"
               placeholder="03XXXXXXXXX"
               maxLength={11}
@@ -154,12 +166,6 @@ export default function AccountStep({ onAuthenticated }) {
               maxLength={100}
               {...registerForm.register('city')}
               error={registerForm.formState.errors.city?.message}
-            />
-            <Input
-              label="Password"
-              type="password"
-              {...registerForm.register('password')}
-              error={registerForm.formState.errors.password?.message}
             />
             <p className="text-xs text-charcoal-light">
               This will be saved as your delivery address — you can change it anytime from your profile.

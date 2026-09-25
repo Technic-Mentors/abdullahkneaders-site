@@ -65,6 +65,16 @@ export default function Footer() {
                 </FooterLink>
               ))}
             </ul>
+                {/* Social icons */}
+            <div className="mt-4 flex items-center gap-1.5">
+              <SocialLink
+                href={`https://wa.me/${WHATSAPP_NUMBER}`}
+                label="WhatsApp"
+                icon={<WhatsAppIcon />}
+              />
+              <SocialLink href={FACEBOOK_URL} label="Facebook" icon={<FacebookIcon />} />
+              <SocialLink href={INSTAGRAM_URL} label="Instagram" icon={<InstagramIcon />} />
+            </div>
           </div>
 
           {/* ── Useful Links ── */}
@@ -126,16 +136,7 @@ export default function Footer() {
               />
             </div>
 
-            {/* Social icons */}
-            <div className="mt-2.5 flex items-center gap-1.5">
-              <SocialLink
-                href={`https://wa.me/${WHATSAPP_NUMBER}`}
-                label="WhatsApp"
-                icon={<WhatsAppIcon />}
-              />
-              <SocialLink href={FACEBOOK_URL} label="Facebook" icon={<FacebookIcon />} />
-              <SocialLink href={INSTAGRAM_URL} label="Instagram" icon={<InstagramIcon />} />
-            </div>
+        
           </div>
         </div>
       </div>

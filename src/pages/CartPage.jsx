@@ -10,6 +10,8 @@ import Input from '../components/ui/Input';
 import EmptyState from '../components/ui/EmptyState';
 import { formatCurrency } from '../utils/format';
 import { previewCoupon } from '../api/coupons.api';
+import { getPublicSettings, getPublicShipping } from '../api/settings.api';
+import { useAsync } from '../hooks/useAsync';
 import { useAuthStore } from '../store/useAuthStore';
 import { getErrorMessage } from '../utils/errorMessage';
 
@@ -23,12 +25,26 @@ export default function CartPage() {
   const [proceeding, setProceeding] = useState(false);
   const proceedTimeoutRef = useRef(null);
 
+  const { data: shippingConfig } = useAsync(() => getPublicShipping(), []);
+
   useEffect(() => {
     return () => clearTimeout(proceedTimeoutRef.current);
   }, []);
 
   const subtotal = cartSubtotal(items);
   const itemCount = items.reduce((sum, i) => sum + i.quantity, 0);
+
+  // Shipping: cart pe address nahi hota, so default rate lagega.
+  // Free threshold cross ho jaye to 0.
+  const shippingCharges = (() => {
+    if (!shippingConfig) return 0;
+    const freeThreshold = Number(shippingConfig.freeShippingThreshold ?? 0);
+    if (freeThreshold > 0 && subtotal >= freeThreshold) return 0;
+    return Number(shippingConfig.defaultShippingRate ?? 0);
+  })();
+
+  const discountAmount = discount?.discountAmount || 0;
+  const total = subtotal - discountAmount + shippingCharges;
 
   async function applyCoupon() {
     if (!couponCode.trim()) return;
@@ -110,21 +126,23 @@ export default function CartPage() {
               <span>Subtotal</span>
               <span className="font-medium text-charcoal">{formatCurrency(subtotal)}</span>
             </div>
+            <div className="flex justify-between text-charcoal-light">
+              <span>Shipping</span>
+              <span className="font-medium text-charcoal">
+                {shippingCharges === 0 ? 'Free' : formatCurrency(shippingCharges)}
+              </span>
+            </div>
             {discount && (
               <div className="flex justify-between text-green-700">
                 <span>Discount ({discount.code})</span>
-                <span>-{formatCurrency(discount.discountAmount)}</span>
+                <span>-{formatCurrency(discountAmount)}</span>
               </div>
             )}
-            <div className="flex justify-between text-charcoal-light">
-              <span>Shipping</span>
-              <span>Calculated at checkout</span>
-            </div>
           </div>
 
           <div className="flex justify-between border-t border-stone-100 pt-4 text-base font-semibold text-charcoal">
-            <span>Estimated Total</span>
-            <span>{formatCurrency(subtotal - (discount?.discountAmount || 0))}</span>
+            <span>Total</span>
+            <span>{formatCurrency(total)}</span>
           </div>
 
           <Button
